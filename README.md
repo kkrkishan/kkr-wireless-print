@@ -1,17 +1,19 @@
-# KKR Wireless Print — Phase 1: Windows Print Server
+# KKR Wireless Print — Phase 1 & Phase 2: Complete System
 
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/)
+[![Flutter](https://img.shields.io/badge/Flutter-3.47.8-02569B.svg)](https://flutter.dev/)
+[![Android](https://img.shields.io/badge/Android-8.0%2B%20(API%2023%2B)-3DDC84.svg)](https://developer.android.com/)
 [![Windows](https://img.shields.io/badge/Windows-10%20%2F%2011-0078D6.svg)](https://microsoft.com/windows)
-[![WPF](https://img.shields.io/badge/UI-WPF%20Desktop-purple.svg)](https://docs.microsoft.com/dotnet/desktop/wpf/)
-[![Tests](https://img.shields.io/badge/Tests-29%20Passed%20(100%25)-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Windows%20Tests-29%20Passed-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Flutter%20Tests-6%20Passed-brightgreen.svg)]()
 
-**KKR Wireless Print** is a local network desktop printing system enabling authorized mobile applications (Android) on the same Wi-Fi network to submit documents (PDF, PNG, JPG, JPEG) to physical USB printers connected to a Windows laptop **without requiring internet connectivity or cloud print services**.
+**KKR Wireless Print** is an end-to-end local network wireless printing system. It enables Android mobile phones connected to a private Wi-Fi network to discover, pair with, and print documents (PDF, JPG, JPEG, PNG) directly to physical USB printers attached to a Windows laptop **without internet access, cloud services, or third-party print relays**.
 
 ---
 
 ## 1. Physical Hardware & Installed Printers
 
-On this Windows host, both physical USB printers were discovered, verified, and mapped:
+The Windows Print Server enumerates and manages physical USB printers:
 
 | Printer Name | Connection / Port | Driver | Type | Color | Duplex | Hardware Status |
 | :--- | :--- | :--- | :--- | :---: | :---: | :--- |
@@ -22,81 +24,103 @@ On this Windows host, both physical USB printers were discovered, verified, and 
 
 ---
 
-## 2. Architecture & Solution Structure
-
-The solution follows a clean modular architecture separating Core domain logic, Local API, WPF Desktop Dashboard, and automated test suites:
+## 2. System Architecture
 
 ```
-c:\Google Antigravity\KKR WIRELESS PRINT\
-├── KKRWirelessPrint.sln               # Master solution file
-├── Directory.Build.props              # Shared build settings (C# 12, .NET 8)
-├── nuget.config                       # Isolated package repository configuration
-├── scripts/
-│   ├── Configure-Firewall.ps1         # Windows Firewall rule setup (Private profile only)
-│   └── Run-Server.ps1                 # One-click desktop launcher
-├── src/
-│   ├── KKR.PrintServer.Core/          # Domain models, spooler integration, PDF/Image renderers
-│   │   ├── Models/                    # PrinterInfo, PrintJobRecord, PrintJobRequest, Enums
-│   │   ├── Services/
-│   │   │   ├── PrinterDiscoveryService.cs  # System.Printing & Win32 winspool enumeration
-│   │   │   ├── PrintProcessor.cs           # GDI+ / PrintDocument pipeline with exact geometry
-│   │   │   ├── PdfRenderer.cs              # Windows.Data.Pdf native WinRT vector rendering
-│   │   │   ├── ImageRenderer.cs            # EXIF orientation, Bicubic scaling (Fit/Fill/Actual)
-│   │   │   ├── TestPageGenerator.cs        # 300 DPI high-res diagnostic test page generator
-│   │   │   ├── JobQueueService.cs          # Thread-safe queue worker & cancellation manager
-│   │   │   ├── SecurityService.cs          # PIN generator, HMAC token auth, deduplication, magic bytes
-│   │   │   ├── CertificateService.cs       # X.509 self-signed TLS cert generator with SANs
-│   │   │   └── NativePrintSpooler.cs       # Win32 winspool.drv P/Invoke (SetJob, CancelSpoolerJob)
-│   │   └── Logging/
-│   │       ├── AppLogger.cs                # Observable in-memory log sink + rotating file logs
-│   │       └── LogEntry.cs                 # Structured log entity (no document content logged)
-│   ├── KKR.PrintServer.Api/           # In-process Kestrel ASP.NET Core local network service
-│   │   ├── Middleware/
-│   │   │   └── TokenAuthenticationMiddleware.cs # Bearer token validator for protected routes
-│   │   ├── Endpoints/
-│   │   │   ├── DiscoveryEndpoints.cs       # /api/v1/discovery & /api/v1/health
-│   │   │   ├── AuthEndpoints.cs            # /api/v1/auth/pair (PIN validation)
-│   │   │   ├── PrinterEndpoints.cs         # /api/v1/printers (Status & Capabilities)
-│   │   │   └── JobEndpoints.cs             # /api/v1/jobs (Multipart print submissions)
-│   │   └── Server/
-│   │       └── PrintApiHost.cs             # Dual HTTP/HTTPS Kestrel server binding
-│   └── KKR.PrintServer.App/           # Modern WPF Desktop Dashboard
-│       ├── App.xaml / App.xaml.cs     # Composition root & lifecycle
-│       ├── MainWindow.xaml / .cs      # Dark-slate dashboard UI
-│       └── ViewModels/
-│           ├── MainViewModel.cs       # State manager, background timers, commands
-│           ├── PrinterItemViewModel.cs # Per-printer card & direct test-print action
-│           ├── JobItemViewModel.cs     # Real-time spooler queue item with cancel action
-│           └── RelayCommand.cs         # MVVM command implementation
-└── tests/
-    └── KKR.PrintServer.Tests/         # 29 xUnit unit & integration tests
-        ├── SecurityServiceTests.cs    # PIN & token authentication tests
-        ├── FileValidationTests.cs     # Magic byte verification (PDF, PNG, JPEG)
-        ├── PageRangeParserTests.cs    # Page range filtering ("1-3, 5, 8")
-        ├── IdempotencyTests.cs        # Deduplication of identical requests
-        ├── ApiIntegrationTests.cs     # End-to-end API test server verification
-        └── HardwareVerificationTests.cs # Physical printer discovery & 300 DPI rendering tests
+ c:\Google Antigravity\KKR WIRELESS PRINT\
+ ├── KKRWirelessPrint.sln               # Master Windows solution
+ ├── KKR_Wireless_Print_APK/            # Standalone Android APK distributions
+ │   ├── kkr-wireless-print-release.apk # Production Release APK (67.5 MB)
+ │   ├── kkr-wireless-print-debug.apk   # Development Debug APK (172 MB)
+ │   └── Install-APK.bat                # 1-Click ADB installer script
+ ├── android_client/                    # Complete Flutter & Dart mobile application
+ │   ├── lib/
+ │   │   ├── models/                    # ServerConnection, PrinterInfo, PrintJob, PrintOptions
+ │   │   ├── services/                  # ApiService (Dio, TLS, Auth), StorageService
+ │   │   └── ui/
+ │   │       ├── screens/               # HomeScreen, ConnectScreen (QR & Manual), PreviewAndSettingsScreen
+ │   │       ├── widgets/               # JobTrackingDialog, StatusBadge, PrinterCard
+ │   │       └── theme/                 # Dark slate theme matching Windows UI
+ │   └── test/                          # Unit & integration tests for models and serialization
+ ├── src/
+ │   ├── KKR.PrintServer.Core/          # Spooler integration, PDF/Image renderers, PIN auth
+ │   ├── KKR.PrintServer.Api/           # Dual HTTP/HTTPS Kestrel ASP.NET Core endpoints
+ │   └── KKR.PrintServer.App/           # Modern WPF Desktop Dashboard with dynamic QR code
+ └── tests/
+     └── KKR.PrintServer.Tests/         # 29 xUnit automated tests
 ```
 
 ---
 
-## 3. Security & Network Model
+## 3. Android Application Features
 
-* **Zero Internet Requirement**: Operates strictly on private Wi-Fi (binds to active LAN IP, e.g. `10.92.81.221`).
-* **Dynamic Pairing PIN**: Generates a cryptographically secure 6-digit random PIN displayed on the desktop dashboard. Expiration is enforced (default 15 minutes) with constant-time verification (`CryptographicOperations.FixedTimeEquals`).
-* **Cryptographic Token Authorization**: When an Android device pairs with the correct PIN, the server issues a 256-bit cryptographically random Bearer token. Subsequent requests must include `Authorization: Bearer <token>`.
-* **Private Network Firewall Rules**: Windows Firewall is never disabled. Run `scripts/Configure-Firewall.ps1` to open TCP ports `8443` and `8080` exclusively on the **Private** network profile.
-* **HTTPS & Certificate Strategy**: The server automatically generates an RSA-2048, SHA-256 self-signed X.509 certificate with Subject Alternative Names (SANs) for `localhost`, the machine name, and all detected LAN IPs. Public certificates (`kkr-print-server.cer` and `.pem`) are exported to `certs/` for Android trust or certificate pinning.
-* **Payload Validation & Safe Temp Files**:
-  * **Magic Bytes Check**: Verifies file headers (`%PDF-`, `PNG`, `JPEG`) before spooling. Rejects executable or forged file extensions.
-  * **Configurable Size Limits**: Rejects uploads exceeding 50 MB (configurable).
-  * **Safe Temp Handling**: Files are written to unique GUID filenames in `temp_spool/` and deleted immediately upon completion or cancellation.
-* **Idempotency & Deduplication**: Clients provide an `X-Idempotency-Key` or form parameter. Rapid double-taps return the original job without wasting physical ink or paper.
-* **Zero Document Payload Logging**: Structured audit logs record timestamp, level, document name, size, page count, and status. Document contents are **never** logged to disk.
+* **Quick Pairing (2 Methods)**:
+  1. **Scan QR Code**: Point camera at the scannable QR code on the Windows desktop dashboard to automatically import IP, ports, TLS thumbprint, and active 6-digit PIN.
+  2. **Manual IP & PIN Setup**: Enter the laptop's private LAN IPv4 address (e.g. `10.92.81.221`), port (`8080` / `8443`), and the 6-digit dashboard PIN.
+* **Document Picker & Android System Share**:
+  * Browse device storage for PDF documents and images (JPG, JPEG, PNG).
+  * Receive files shared directly from any app (WhatsApp, Chrome, File Manager, Gallery) via the Android System Share sheet (`ACTION_SEND`).
+* **Visual Document Preview & Page Count**:
+  * Real-time PDF page rendering using native vector graphics.
+  * Image dimension and file size inspection before printing.
+* **Printer & Capabilities Routing**:
+  * Real-time printer discovery from Windows API displaying exact driver capabilities.
+  * Color mode validation: Disables color options and informs user when `Canon MF4800` (Monochrome) is selected.
+* **Granular Print Settings**:
+  * Copies stepper (1 to max driver limit).
+  * Page range selection (`"all"`, `"1-3, 5"`).
+  * Paper size selection (`A4`, `Letter`, `Legal`, etc.).
+  * Orientation (`Auto`, `Portrait`, `Landscape`).
+  * Scaling modes (`Fit to Page`, `Fill Page`, `Actual Size`).
+  * Center on page toggle.
+* **Live Spooler Timeline & Progress**:
+  * Real-time upload percentage with byte counter.
+  * Live Windows spooler polling: `Accepted` → `Queued` → `Processing` → `Completed`.
+  * Safe job cancellation directly from mobile while queued in Windows spooler.
+* **Deduplication & Security**:
+  * Client-generated `X-Idempotency-Key` prevents double-printing on network retries.
+  * Encrypted storage for pairing credentials (`SharedPreferences`).
+  * Custom TLS adapter handling self-signed private LAN certificates.
 
 ---
 
-## 4. REST API Specification
+## 4. How to Install the Android App
+
+### Method A: One-Click USB Install (Recommended if phone has USB Debugging)
+1. Connect your Android phone to the laptop via USB cable.
+2. Ensure **USB Debugging** is enabled in *Settings → Developer Options*.
+3. Open `c:\Google Antigravity\KKR WIRELESS PRINT\KKR_Wireless_Print_APK\` and double-click `Install-APK.bat`.
+4. Tap **Allow** on your phone screen if prompted.
+
+### Method B: Direct File Transfer (No Developer Options required)
+1. Copy `kkr-wireless-print-release.apk` from `KKR_Wireless_Print_APK\` to your phone via:
+   * USB file transfer (MTP).
+   * Local Wi-Fi sharing, Bluetooth, WhatsApp, or Google Drive.
+2. On your phone, tap `kkr-wireless-print-release.apk` in Files / Downloads.
+3. When prompted, toggle **Allow from this source** (Install unknown apps).
+4. Tap **Install** and open **KKR Wireless Print**.
+
+---
+
+## 5. How to Connect Phone to Windows Print Server
+
+1. **Start the Windows Print Server**:
+   * Double-click `run-server.bat` in the repository root or run `.\scripts\Run-Server.ps1`.
+   * The WPF desktop application opens, showing the active Wi-Fi IP (e.g. `10.92.81.221`), active port (`8080`), a dynamic 6-digit PIN, and a **QR Code**.
+2. **Ensure Both Devices are on the Same Wi-Fi**:
+   * Both your laptop and Android phone must be connected to the same local Wi-Fi router or laptop mobile hotspot.
+3. **Open KKR Wireless Print on Phone**:
+   * Tap **Connect to Computer** (or tap the connection status pill).
+   * **Option 1 (Fastest)**: Tap the **Scan QR Code** tab, point your camera at the laptop screen QR code. Pairing happens instantly!
+   * **Option 2**: Tap **Manual Setup**, enter the Laptop IP, Port, and 6-digit PIN, then tap **Pair with Server**.
+4. **Select File & Print**:
+   * Tap **Print Document** or share a document from your phone's file manager.
+   * Verify print settings, select either **EPSON L3210 Series** or **Canon MF4800 Series**, and tap **Send Print Job**.
+   * Track upload and Windows spooler progress in real time!
+
+---
+
+## 6. REST API Specification
 
 ### Public Endpoints (No Token Required)
 * **`GET /api/v1/discovery`**
@@ -113,19 +137,11 @@ c:\Google Antigravity\KKR WIRELESS PRINT\
 * **`GET /api/v1/printers/{name}`**
   * Detailed info for a specific printer.
 * **`POST /api/v1/jobs`** (Multipart `multipart/form-data`)
-  * `file`: Binary stream (PDF, JPG, JPEG, PNG).
-  * `printerName`: Destination printer name.
-  * `copies`: Integer copy count (default `1`).
-  * `pageRange`: Optional range string (e.g. `"1-3, 5"` or `"all"`).
-  * `orientation`: `"Auto"`, `"Portrait"`, or `"Landscape"`.
-  * `paperSize`: Target paper name (e.g. `"A4"`, `"Letter"`).
-  * `colorMode`: `"Auto"`, `"Color"`, or `"Grayscale"`.
-  * `scalingMode`: `"FitPage"`, `"FillPage"`, or `"ActualSize"`.
-  * `centerOnPage`: Boolean (default `true`).
-  * `idempotencyKey`: Client UUID string.
+  * Headers: `X-Idempotency-Key: <guid>`
+  * Fields: `file` (stream), `printerName`, `copies`, `pageRange`, `orientation`, `paperSize`, `colorMode`, `scalingMode`, `centerOnPage`, `idempotencyKey`.
   * Returns: HTTP `202 Accepted` with `jobId` and spooling status.
 * **`GET /api/v1/jobs/{id}`**
-  * Current status of print job: `Accepted`, `Queued`, `Processing`, `Completed`, `Failed`, or `Cancelled`.
+  * Real-time status: `Accepted`, `Queued`, `Processing`, `Completed`, `Failed`, or `Cancelled`.
 * **`POST /api/v1/jobs/{id}/cancel`**
   * Cancels active job in queue or spooler.
 * **`GET /api/v1/jobs`**
@@ -133,67 +149,30 @@ c:\Google Antigravity\KKR WIRELESS PRINT\
 
 ---
 
-## 5. Build and Execution Instructions
+## 7. Verification & Automated Test Results
 
-### Prerequisites
-* Windows 10/11 x64.
-* .NET 8 SDK (installed at `C:\Users\kisha\.dotnet` or standard Program Files).
-
-### Compiling the Solution
-```powershell
-$env:Path = "C:\Users\kisha\.dotnet;" + $env:Path
-dotnet build KKRWirelessPrint.sln
-```
-
-### Running All Automated Tests
+### Windows Print Server Test Suite
 ```powershell
 $env:Path = "C:\Users\kisha\.dotnet;" + $env:Path
 dotnet test tests\KKR.PrintServer.Tests\KKR.PrintServer.Tests.csproj --logger "console;verbosity=normal"
 ```
+* **Result**: **29/29 Passed (100%)**
+  * Security & Auth (PIN generation, validation, rejection, token revocation): 4/4
+  * File Validation (PDF `%PDF-`, PNG, JPEG, zero-byte, size limit, forged extensions): 6/6
+  * Page Range Parsing (`1-3, 5, 8`, bounds checking, empty/all): 7/7
+  * Request Idempotency & Deduplication: 1/1
+  * Physical Hardware & Vector PDF/Image Rendering (300 DPI, EPSON L3210 & Canon MF4800): 4/4
+  * Full End-to-End API Integration (Pairing, 401 Unauthorized, 202 Accepted Spooling): 7/7
 
-### Launching the Windows Desktop Application
+### Android Mobile Test Suite
 ```powershell
-.\scripts\Run-Server.ps1
+Set-Location "android_client"
+flutter test
 ```
-Or directly:
-```powershell
-& "src\KKR.PrintServer.App\bin\Debug\net8.0-windows10.0.19041.0\KKR.PrintServer.App.exe"
-```
-
----
-
-## 6. Test Results Summary
-
-A total of **29 automated tests** were executed and passed with 100% success:
-
-* **Security & Auth Tests (4/4)**: PIN generation, pairing authentication, invalid PIN rejection, client revocation.
-* **File Validation Tests (6/6)**: PDF magic byte validation (`%PDF-`), PNG magic bytes, JPEG magic bytes, zero-byte rejection, size limit rejection, forged extension detection.
-* **Page Range Parser Tests (7/7)**: Multi-range parsing (`"1-3, 5, 8"`), empty/all ranges, out-of-range bounds clipping, ascending ordering.
-* **Idempotency Tests (1/1)**: Deduplication identification and existing job ID resolution.
-* **Hardware & Rendering Tests (4/4)**:
-  * Enumeration of physical USB printers (`EPSON L3210 Series` on `USB001`, `Canon MF4800 Series UFRII LT` on `USB004`).
-  * Native PDF vector rendering at 300 DPI (`2550 x 3300` px) without distortion.
-  * 300 DPI diagnostic test page generation (`2480 x 3508` px) with color calibration bars and alignment patterns.
-  * High-quality bicubic aspect ratio scaling calculations (`FitPage`, `FillPage`, `ActualSize`).
-* **API Integration Tests (7/7)**: Public discovery endpoint, health check, 401 Unauthorized rejection for missing tokens, successful PIN pair and token exchange, 400 Bad Request on invalid PIN, multipart PDF job submission (202 Accepted), idempotency duplicate detection.
-
----
-
-## 7. Phase 2: Android App Implementation Roadmap
-
-With Phase 1 complete and verified, Phase 2 will deliver the companion Android application:
-
-1. **Discovery & Connection Module**:
-   * mDNS / NSD (Network Service Discovery) or direct IP entry (`10.92.81.221`).
-   * Ping `GET /api/v1/discovery` to verify Windows server presence.
-2. **Pairing Flow**:
-   * Screen prompting for the 6-digit PIN shown on the laptop dashboard.
-   * `POST /api/v1/auth/pair` storing the received Bearer token in Android `EncryptedSharedPreferences`.
-   * SSL Pinning using the exported `kkr-print-server.cer` or certificate thumbprint.
-3. **Document Selection & Print Settings UI**:
-   * Android Document Picker for PDFs and Gallery Picker for images.
-   * Printer selection dropdown displaying `EPSON L3210` (Color) and `Canon MF4800` (Mono Duplex).
-   * Settings: Copies, Page Range, Orientation (Auto/Portrait/Landscape), Color Mode, Scaling (Fit to Page / Fill Page).
-4. **Job Submission & Polling**:
-   * Background upload via Retrofit / OkHttp with `X-Idempotency-Key`.
-   * Real-time progress bar polling `GET /api/v1/jobs/{id}` until spooler acceptance.
+* **Result**: **6/6 Passed (100%)**
+  * ServerConnection model serialization and deserialization
+  * PrinterInfo Epson color capability parsing
+  * PrinterInfo Canon monochrome capability parsing
+  * PrintJob status transitions and terminal states
+  * Human-readable file size formatting
+  * PrintOptions multipart form data conversion

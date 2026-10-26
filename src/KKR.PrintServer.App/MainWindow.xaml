@@ -132,21 +132,37 @@
 
                         <TextBlock Text="Enter this 6-digit PIN on the KKR Android App to authorize connection:" FontSize="12" Foreground="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,0,0,12" />
 
-                        <!-- PIN DISPLAY -->
-                        <Border Background="#0F172A" BorderBrush="#2563EB" BorderThickness="2" CornerRadius="8" Padding="12,10" Margin="0,0,0,10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding CurrentPin}" FontSize="32" FontWeight="Bold" FontFamily="Consolas" Foreground="#60A5FA" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <Button Grid.Column="1" Content="📋 Copy" Command="{Binding CopyPinCommand}" Style="{StaticResource ModernButton}" Background="#334155" Margin="8,0,0,0" Padding="8,4" FontSize="11" />
-                                <Button Grid.Column="2" Content="🔄 New PIN" Command="{Binding RegeneratePinCommand}" Style="{StaticResource ModernButton}" Background="#1E3A8A" Margin="6,0,0,0" Padding="8,4" FontSize="11" />
-                            </Grid>
-                        </Border>
+                        <!-- QR CODE & PIN SECTION -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="{Binding PinExpiryText}" FontSize="11" Foreground="{StaticResource WarningAmber}" HorizontalAlignment="Center" Margin="0,0,0,12" />
+                            <!-- QR CODE BOX -->
+                            <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="6" Width="110" Height="110" Margin="0,0,12,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Image Source="{Binding QrCodeImage}" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                            </Border>
+
+                            <!-- PIN AND ACTIONS -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="PAIRING PIN" FontSize="10" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,4" />
+                                <Border Background="#0F172A" BorderBrush="#2563EB" BorderThickness="2" CornerRadius="8" Padding="10,6" Margin="0,0,0,6">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding CurrentPin}" FontSize="26" FontWeight="Bold" FontFamily="Consolas" Foreground="#60A5FA" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Button Grid.Column="1" Content="📋" Command="{Binding CopyPinCommand}" Style="{StaticResource ModernButton}" Background="#334155" Margin="6,0,0,0" Padding="6,2" FontSize="11" ToolTip="Copy PIN" />
+                                    </Grid>
+                                </Border>
+                                <TextBlock Text="{Binding PinExpiryText}" FontSize="10" Foreground="{StaticResource WarningAmber}" Margin="0,0,0,6" />
+                                <Button Content="🔄 Regenerate PIN" Command="{Binding RegeneratePinCommand}" Style="{StaticResource ModernButton}" Background="#1E3A8A" Padding="8,4" FontSize="10" HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="📷 Scan QR code with KKR Android app, or enter PIN manually." FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,0,0,10" />
 
                         <Grid Margin="0,4,0,0">
                             <Grid.ColumnDefinitions>

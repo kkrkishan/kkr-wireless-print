@@ -9,6 +9,8 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Windows.Media.Imaging;
+using QRCoder;
 using KKR.PrintServer.Api.Server;
 using KKR.PrintServer.Core.Logging;
 using KKR.PrintServer.Core.Models;
@@ -35,6 +37,9 @@ public class MainViewModel : INotifyPropertyChanged
     private string _httpsThumbprint = string.Empty;
     private PrinterItemViewModel? _selectedPrinter;
     private string _statusMessage = "Ready";
+    private BitmapSource? _qrCodeImage;
+    private string _lastQrPin = string.Empty;
+    private string _lastQrIp = string.Empty;
 
     public MainViewModel(
         ServerConfig config,
@@ -128,6 +133,12 @@ public class MainViewModel : INotifyPropertyChanged
     {
         get => _pinExpiryText;
         set { _pinExpiryText = value; OnPropertyChanged(); }
+    }
+
+    public BitmapSource? QrCodeImage
+    {
+        get => _qrCodeImage;
+        private set { _qrCodeImage = value; OnPropertyChanged(); }
     }
 
     public PrinterItemViewModel? SelectedPrinter
@@ -395,6 +406,52 @@ public class MainViewModel : INotifyPropertyChanged
         else
         {
             PinExpiryText = "Expired - Auto-renewing";
+        }
+
+        UpdateQrCode();
+    }
+
+    private void UpdateQrCode()
+    {
+        if (string.IsNullOrEmpty(CurrentPin) || (CurrentPin == _lastQrPin && ServerIp == _lastQrIp && QrCodeImage != null))
+        {
+            return;
+        }
+
+        try
+        {
+            var payload = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                server = ServerIp,
+                httpPort = HttpPort,
+                httpsPort = HttpsPort,
+                pin = CurrentPin,
+                thumbprint = HttpsThumbprint
+            });
+
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrData = qrGenerator.CreateQrCode(payload, QRCodeGenerator.ECCLevel.M);
+            using var qrCode = new PngByteQRCode(qrData);
+            byte[] qrBytes = qrCode.GetGraphic(8);
+
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
+                var bitmap = new BitmapImage();
+                using var stream = new MemoryStream(qrBytes);
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.StreamSource = stream;
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                QrCodeImage = bitmap;
+                _lastQrPin = CurrentPin;
+                _lastQrIp = ServerIp;
+            });
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Instance.Error("UI", "Failed to generate pairing QR code", ex);
         }
     }
 

@@ -2,6 +2,7 @@
 bin/
 obj/
 .nuget/
+.dotnet/
 .dotnet_cli/
 .appdata/
 *.log
@@ -13,3 +14,13 @@ certs/
 # Published standalone folder
 KKR_Print_Server/
 publish/
+
+# Android build cache and binaries
+android_client/.gradle/
+android_client/android/.gradle/
+android_client/build/
+android_client/.dart_tool/
+accept-licenses.ps1
+*.apk
+
+
