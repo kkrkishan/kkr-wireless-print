@@ -11,7 +11,9 @@ public class SecurityService : ISecurityService
 {
     private readonly object _pinLock = new();
     private string _currentPin = string.Empty;
+    private string _previousPin = string.Empty;
     private DateTime _pinExpiresAtUtc;
+    private DateTime _previousPinExpiresAtUtc;
     private readonly int _pinExpiryMinutes;
     private readonly string _spoolTempDirectory;
 
@@ -77,6 +79,12 @@ public class SecurityService : ISecurityService
 
     private string GenerateNewPinInternal()
     {
+        if (!string.IsNullOrEmpty(_currentPin))
+        {
+            _previousPin = _currentPin;
+            _previousPinExpiresAtUtc = DateTime.UtcNow.AddMinutes(5);
+        }
+
         int num = RandomNumberGenerator.GetInt32(100000, 1000000);
         _currentPin = num.ToString("D6");
         _pinExpiresAtUtc = DateTime.UtcNow.AddMinutes(_pinExpiryMinutes);
@@ -92,22 +100,22 @@ public class SecurityService : ISecurityService
             return new PairResponse { Success = false, ErrorMessage = "PIN cannot be empty." };
         }
 
+        string cleanPin = pin.Trim();
+
         lock (_pinLock)
         {
-            if (DateTime.UtcNow > _pinExpiresAtUtc)
-            {
-                AppLogger.Instance.Security("Auth", $"Pairing failed: Expired PIN submitted from {clientIp}");
-                return new PairResponse { Success = false, ErrorMessage = "PIN has expired. Check the server dashboard for the current PIN." };
-            }
+            bool isCurrentMatch = !string.IsNullOrEmpty(_currentPin) &&
+                                  DateTime.UtcNow <= _pinExpiresAtUtc &&
+                                  IsPinEqual(_currentPin, cleanPin);
 
-            // Constant-time PIN check
-            byte[] expectedBytes = Encoding.UTF8.GetBytes(_currentPin);
-            byte[] actualBytes = Encoding.UTF8.GetBytes(pin.Trim());
+            bool isPreviousMatch = !string.IsNullOrEmpty(_previousPin) &&
+                                   DateTime.UtcNow <= _previousPinExpiresAtUtc &&
+                                   IsPinEqual(_previousPin, cleanPin);
 
-            if (expectedBytes.Length != actualBytes.Length || !CryptographicOperations.FixedTimeEquals(expectedBytes, actualBytes))
+            if (!isCurrentMatch && !isPreviousMatch)
             {
-                AppLogger.Instance.Security("Auth", $"Pairing failed: Invalid PIN submitted from {clientIp} ({deviceName})");
-                return new PairResponse { Success = false, ErrorMessage = "Invalid PIN." };
+                AppLogger.Instance.Security("Auth", $"Pairing failed: Invalid PIN submitted '{cleanPin}' (Current: '{_currentPin}', Previous: '{_previousPin}') from {clientIp} ({deviceName})");
+                return new PairResponse { Success = false, ErrorMessage = "Invalid or expired PIN. Check current PIN on server." };
             }
         }
 
@@ -343,5 +351,12 @@ public class SecurityService : ISecurityService
     {
         byte[] bytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
         return Convert.ToHexString(bytes);
+    }
+
+    private static bool IsPinEqual(string expected, string actual)
+    {
+        byte[] expectedBytes = Encoding.UTF8.GetBytes(expected);
+        byte[] actualBytes = Encoding.UTF8.GetBytes(actual);
+        return expectedBytes.Length == actualBytes.Length && CryptographicOperations.FixedTimeEquals(expectedBytes, actualBytes);
     }
 }

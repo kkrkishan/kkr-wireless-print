@@ -151,9 +151,11 @@ class ApiService {
       } on DioException catch (e) {
         if (e.response?.statusCode == 400) {
           final data = e.response?.data;
-          final msg = (data is Map && data['message'] != null)
-              ? data['message'].toString()
-              : 'Invalid or expired PIN. Please enter the current PIN from the Windows server.';
+          final msg = (data is Map && data['errorMessage'] != null)
+              ? data['errorMessage'].toString()
+              : (data is Map && data['message'] != null)
+                  ? data['message'].toString()
+                  : 'Invalid or expired PIN. Please enter the current PIN from the Windows server.';
           return ApiResult.failure(msg, statusCode: 400);
         }
         lastError = _formatDioError(e);

@@ -201,7 +201,14 @@ class _ConnectScreenState extends State<ConnectScreen>
         setState(() {
           _isLoading = false;
           _errorMessage = pairResult.errorMessage;
-          _isScanningHandled = false;
+        });
+        // Delay before allowing re-scan to prevent instant frame loop
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            setState(() {
+              _isScanningHandled = false;
+            });
+          }
         });
       }
       return;
