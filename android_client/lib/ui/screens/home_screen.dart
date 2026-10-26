@@ -86,9 +86,23 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _handleIncomingSharedFile(File file) {
+  Future<void> _handleIncomingSharedFile(File file) async {
     if (!mounted) return;
-    _openPrintFlow(file);
+
+    // Ensure connection & printers are loaded if coming from cold start
+    if (_connection == null || !_api.isAuthenticated) {
+      await _storage.init();
+      _connection = await _storage.loadServerConnection();
+      if (_connection != null && _connection!.token != null) {
+        _api.configure(_connection!);
+      }
+    }
+
+    if (_api.isAuthenticated && _printers.isEmpty) {
+      await _refreshPrinters(silent: true);
+    }
+
+    await _openPrintFlow(file);
   }
 
   Future<void> _refreshPrinters({bool silent = false}) async {
@@ -159,8 +173,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _openPrintFlow(File file) async {
     if (_connection == null || !_api.isAuthenticated) {
+      await _storage.init();
+      _connection = await _storage.loadServerConnection();
+      if (_connection != null && _connection!.token != null) {
+        _api.configure(_connection!);
+        await _refreshPrinters(silent: true);
+      }
+    }
+
+    if (_connection == null || !_api.isAuthenticated) {
       _showConnectPrompt();
       return;
+    }
+
+    if (_printers.isEmpty) {
+      await _refreshPrinters(silent: true);
     }
 
     final savedPrinterName = await _storage.loadSelectedPrinter();

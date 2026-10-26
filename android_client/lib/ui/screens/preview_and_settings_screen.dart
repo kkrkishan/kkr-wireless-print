@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart' as pdfx;
 import '../../models/printer_info.dart';
 import '../../models/print_options.dart';
+import '../../services/api_service.dart';
 import '../../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/job_tracking_dialog.dart';
@@ -41,7 +42,9 @@ class _PreviewAndSettingsScreenState extends State<PreviewAndSettingsScreen> {
   pdfx.PdfPageImage? _pdfFirstPageImage;
   bool _isLoadingPreview = true;
 
-  // Settings
+  // Printers & Settings
+  List<PrinterInfo> _printers = [];
+  bool _isLoadingPrinters = false;
   PrinterInfo? _selectedPrinter;
   final PrintOptions _options = PrintOptions();
   final TextEditingController _pageRangeController = TextEditingController();
@@ -51,14 +54,54 @@ class _PreviewAndSettingsScreenState extends State<PreviewAndSettingsScreen> {
     super.initState();
     _currentFile = widget.initialFile;
     _inspectAndLoadFile();
+    _printers = List.from(widget.availablePrinters);
 
-    if (widget.availablePrinters.isNotEmpty) {
-      _selectedPrinter = widget.preselectedPrinter ??
-          widget.availablePrinters.firstWhere(
-            (p) => p.isDefault,
-            orElse: () => widget.availablePrinters.first,
-          );
-      _syncPrinterDefaults(_selectedPrinter!);
+    if (_printers.isNotEmpty) {
+      _selectInitialPrinter(widget.preselectedPrinter);
+    } else {
+      _loadPrinters();
+    }
+  }
+
+  void _selectInitialPrinter(PrinterInfo? candidate) {
+    if (_printers.isEmpty) return;
+    _selectedPrinter = candidate ??
+        _printers.firstWhere(
+          (p) => p.isDefault,
+          orElse: () => _printers.first,
+        );
+    _syncPrinterDefaults(_selectedPrinter!);
+  }
+
+  Future<void> _loadPrinters() async {
+    setState(() => _isLoadingPrinters = true);
+
+    try {
+      final api = ApiService();
+      if (!api.isAuthenticated) {
+        final conn = await StorageService().loadServerConnection();
+        if (conn != null && conn.token != null) {
+          api.configure(conn);
+        }
+      }
+
+      if (api.isAuthenticated) {
+        final res = await api.getPrinters();
+        if (mounted && res.success && res.data != null && res.data!.isNotEmpty) {
+          setState(() {
+            _printers = res.data!;
+            _selectInitialPrinter(null);
+            _isLoadingPrinters = false;
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      debugPrint('Failed to load printers in preview: $e');
+    }
+
+    if (mounted) {
+      setState(() => _isLoadingPrinters = false);
     }
   }
 
@@ -326,28 +369,112 @@ class _PreviewAndSettingsScreenState extends State<PreviewAndSettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'TARGET PRINTER',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.textMuted,
-                letterSpacing: 1,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'TARGET PRINTER',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textMuted,
+                    letterSpacing: 1,
+                  ),
+                ),
+                if (_isLoadingPrinters)
+                  const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppTheme.accentCyan,
+                    ),
+                  )
+                else
+                  InkWell(
+                    onTap: _loadPrinters,
+                    borderRadius: BorderRadius.circular(4),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      child: Row(
+                        children: [
+                          Icon(Icons.refresh, size: 14, color: AppTheme.accentCyan),
+                          SizedBox(width: 4),
+                          Text(
+                            'Refresh',
+                            style: TextStyle(fontSize: 11, color: AppTheme.accentCyan),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 12),
-            if (widget.availablePrinters.isEmpty)
-              const Text(
-                'No installed Windows printers available.',
-                style: TextStyle(color: AppTheme.warningAmber),
+            if (_isLoadingPrinters)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.cardDark,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.accentCyan,
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      'Fetching Windows printers from laptop...',
+                      style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                    ),
+                  ],
+                ),
+              )
+            else if (_printers.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.warningAmber.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: AppTheme.warningAmber.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.warning_amber_rounded,
+                        color: AppTheme.warningAmber, size: 20),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'No printers loaded yet.',
+                        style: TextStyle(color: AppTheme.warningAmber, fontSize: 13),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: _loadPrinters,
+                      icon: const Icon(Icons.refresh, size: 16),
+                      label: const Text('Retry'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppTheme.accentCyan,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                    ),
+                  ],
+                ),
               )
             else
               DropdownButtonFormField<PrinterInfo>(
-                initialValue: _selectedPrinter,
+                value: _selectedPrinter,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.print, color: AppTheme.primaryBlue),
                 ),
-                items: widget.availablePrinters.map((printer) {
+                items: _printers.map((printer) {
                   return DropdownMenuItem<PrinterInfo>(
                     value: printer,
                     child: Row(
