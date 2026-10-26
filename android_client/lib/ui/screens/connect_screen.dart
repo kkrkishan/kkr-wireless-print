@@ -47,7 +47,7 @@ class _ConnectScreenState extends State<ConnectScreen>
           widget.initialConnection!.httpsPort.toString();
       _pinController.text = widget.initialConnection!.pin;
     } else {
-      _ipController.text = '10.134.68.221';
+      _ipController.text = '10.92.81.221';
     }
   }
 
@@ -219,6 +219,7 @@ class _ConnectScreenState extends State<ConnectScreen>
       token: token,
       serverName: serverName,
       machineName: machineName,
+      activeBaseUrl: api.activeBaseUrl,
       lastConnectedAt: DateTime.now(),
       isConnected: true,
     );

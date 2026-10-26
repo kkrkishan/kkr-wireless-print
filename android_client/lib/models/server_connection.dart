@@ -7,6 +7,7 @@ class ServerConnection {
   final String? token;
   final String? serverName;
   final String? machineName;
+  final String? activeBaseUrl;
   final DateTime? lastConnectedAt;
   final bool isConnected;
 
@@ -19,12 +20,14 @@ class ServerConnection {
     this.token,
     this.serverName,
     this.machineName,
+    this.activeBaseUrl,
     this.lastConnectedAt,
     this.isConnected = false,
   });
 
   String get baseUrlHttp => 'http://$ip:$httpPort';
   String get baseUrlHttps => 'https://$ip:$httpsPort';
+  String get effectiveBaseUrl => activeBaseUrl ?? baseUrlHttp;
 
   ServerConnection copyWith({
     String? ip,
@@ -35,6 +38,7 @@ class ServerConnection {
     String? token,
     String? serverName,
     String? machineName,
+    String? activeBaseUrl,
     DateTime? lastConnectedAt,
     bool? isConnected,
   }) {
@@ -47,6 +51,7 @@ class ServerConnection {
       token: token ?? this.token,
       serverName: serverName ?? this.serverName,
       machineName: machineName ?? this.machineName,
+      activeBaseUrl: activeBaseUrl ?? this.activeBaseUrl,
       lastConnectedAt: lastConnectedAt ?? this.lastConnectedAt,
       isConnected: isConnected ?? this.isConnected,
     );
@@ -61,6 +66,7 @@ class ServerConnection {
         'token': token,
         'serverName': serverName,
         'machineName': machineName,
+        'activeBaseUrl': activeBaseUrl,
         'lastConnectedAt': lastConnectedAt?.toIso8601String(),
       };
 
@@ -74,6 +80,7 @@ class ServerConnection {
         token: json['token'] as String?,
         serverName: json['serverName'] as String?,
         machineName: json['machineName'] as String?,
+        activeBaseUrl: json['activeBaseUrl'] as String?,
         lastConnectedAt: json['lastConnectedAt'] != null
             ? DateTime.tryParse(json['lastConnectedAt'] as String)
             : null,

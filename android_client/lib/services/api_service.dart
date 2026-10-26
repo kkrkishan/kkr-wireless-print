@@ -53,10 +53,7 @@ class ApiService {
   void configure(ServerConnection connection) {
     _currentConnection = connection;
     _authToken = connection.token;
-    // Prefer HTTPS if available, otherwise HTTP
-    _activeBaseUrl = connection.httpsPort > 0
-        ? 'https://${connection.ip}:${connection.httpsPort}'
-        : 'http://${connection.ip}:${connection.httpPort}';
+    _activeBaseUrl = connection.effectiveBaseUrl;
 
     _dio.options.headers['Authorization'] =
         _authToken != null ? 'Bearer $_authToken' : null;
@@ -69,6 +66,7 @@ class ApiService {
 
   ServerConnection? get currentConnection => _currentConnection;
   bool get isAuthenticated => _authToken != null && _authToken!.isNotEmpty;
+  String get activeBaseUrl => _activeBaseUrl;
 
   /// Test connection & discover server metadata
   Future<ApiResult<Map<String, dynamic>>> testAndDiscover({
@@ -76,10 +74,10 @@ class ApiService {
     int httpPort = 8080,
     int httpsPort = 8443,
   }) async {
-    // Try HTTPS first, fallback to HTTP
+    // Try HTTP first for fastest LAN response, fallback to HTTPS
     final urlsToTry = [
-      if (httpsPort > 0) 'https://$ip:$httpsPort',
       'http://$ip:$httpPort',
+      if (httpsPort > 0) 'https://$ip:$httpsPort',
     ];
 
     String? lastError;
@@ -87,7 +85,10 @@ class ApiService {
       try {
         final response = await _dio.get(
           '$base/api/v1/discovery',
-          options: Options(receiveTimeout: const Duration(seconds: 5)),
+          options: Options(
+            sendTimeout: const Duration(seconds: 4),
+            receiveTimeout: const Duration(seconds: 4),
+          ),
         );
 
         if (response.statusCode == 200 && response.data is Map) {
@@ -116,9 +117,10 @@ class ApiService {
     String deviceName = 'Android Mobile',
   }) async {
     final urlsToTry = [
-      if (httpsPort > 0) 'https://$ip:$httpsPort',
+      if (_activeBaseUrl.isNotEmpty) _activeBaseUrl,
       'http://$ip:$httpPort',
-    ];
+      if (httpsPort > 0) 'https://$ip:$httpsPort',
+    ].toSet().toList();
 
     String? lastError;
     for (final base in urlsToTry) {
@@ -132,6 +134,7 @@ class ApiService {
           },
           options: Options(
             headers: {'Content-Type': 'application/json'},
+            sendTimeout: const Duration(seconds: 5),
             receiveTimeout: const Duration(seconds: 8),
           ),
         );
