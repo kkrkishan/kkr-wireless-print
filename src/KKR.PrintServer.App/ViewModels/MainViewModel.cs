@@ -389,6 +389,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void OnTimerTick()
     {
+        DetermineLocalIp();
         UpdatePinState();
         UpdateClients();
     }
@@ -505,41 +506,93 @@ public class MainViewModel : INotifyPropertyChanged
     {
         try
         {
-            // Prefer active Wi-Fi or Ethernet adapter
-            foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
-            {
-                if (ni.OperationalStatus != OperationalStatus.Up ||
-                    ni.NetworkInterfaceType == NetworkInterfaceType.Loopback)
+            var validInterfaces = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(ni => ni.OperationalStatus == OperationalStatus.Up &&
+                             ni.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                .Where(ni =>
                 {
-                    continue;
-                }
+                    var name = ni.Name.ToLowerInvariant();
+                    var desc = ni.Description.ToLowerInvariant();
+                    return !name.Contains("vethernet") &&
+                           !name.Contains("virtual") &&
+                           !name.Contains("wsl") &&
+                           !name.Contains("docker") &&
+                           !desc.Contains("virtual") &&
+                           !desc.Contains("hyper-v") &&
+                           !desc.Contains("wsl") &&
+                           !desc.Contains("vmware") &&
+                           !desc.Contains("virtualbox") &&
+                           !desc.Contains("pseudo");
+                })
+                .ToList();
 
-                // Check for Wi-Fi or Ethernet
-                if (ni.NetworkInterfaceType is NetworkInterfaceType.Wireless80211 or NetworkInterfaceType.Ethernet)
+            // 1. Prioritize Wi-Fi (Wireless80211)
+            var wifiAdapter = validInterfaces.FirstOrDefault(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211);
+            if (wifiAdapter != null)
+            {
+                var ip = GetValidIpv4(wifiAdapter);
+                if (!string.IsNullOrEmpty(ip))
                 {
-                    var props = ni.GetIPProperties();
-                    var ipv4 = props.UnicastAddresses
-                        .FirstOrDefault(a => a.Address.AddressFamily == AddressFamily.InterNetwork &&
-                                             !IPAddress.IsLoopback(a.Address));
-                    if (ipv4 != null)
-                    {
-                        ServerIp = ipv4.Address.ToString();
-                        return;
-                    }
+                    ServerIp = ip;
+                    return;
                 }
             }
 
-            var fallback = Dns.GetHostAddresses(Dns.GetHostName())
-                .FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(a));
-            if (fallback != null)
+            // 2. Physical Ethernet
+            var ethAdapter = validInterfaces.FirstOrDefault(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet);
+            if (ethAdapter != null)
             {
-                ServerIp = fallback.ToString();
+                var ip = GetValidIpv4(ethAdapter);
+                if (!string.IsNullOrEmpty(ip))
+                {
+                    ServerIp = ip;
+                    return;
+                }
+            }
+
+            // 3. Any other valid non-virtual interface
+            foreach (var ni in validInterfaces)
+            {
+                var ip = GetValidIpv4(ni);
+                if (!string.IsNullOrEmpty(ip))
+                {
+                    ServerIp = ip;
+                    return;
+                }
+            }
+
+            // 4. Fallback from DNS host addresses excluding virtual subnets
+            var hostIps = Dns.GetHostAddresses(Dns.GetHostName())
+                .Where(a => a.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(a))
+                .Select(a => a.ToString())
+                .Where(ip => !ip.StartsWith("169.254.") && !ip.StartsWith("172.31."))
+                .ToList();
+
+            if (hostIps.Count > 0)
+            {
+                ServerIp = hostIps[0];
+                return;
             }
         }
         catch
         {
+            // Keep existing ServerIp or default
+        }
+
+        if (string.IsNullOrEmpty(ServerIp) || ServerIp == "127.0.0.1")
+        {
             ServerIp = "127.0.0.1";
         }
+    }
+
+    private static string? GetValidIpv4(NetworkInterface ni)
+    {
+        var props = ni.GetIPProperties();
+        var addr = props.UnicastAddresses
+            .FirstOrDefault(a => a.Address.AddressFamily == AddressFamily.InterNetwork &&
+                                 !IPAddress.IsLoopback(a.Address) &&
+                                 !a.Address.ToString().StartsWith("169.254."));
+        return addr?.Address.ToString();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

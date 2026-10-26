@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.NetworkInformation;
 using KKR.PrintServer.Api.Endpoints;
 using KKR.PrintServer.Api.Middleware;
 using KKR.PrintServer.Core.Logging;
@@ -141,11 +142,56 @@ public class PrintApiHost
 
         try
         {
-            var ip = Dns.GetHostAddresses(Dns.GetHostName())
-                .FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !IPAddress.IsLoopback(a));
-            if (ip != null)
+            var validInterfaces = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(ni => ni.OperationalStatus == OperationalStatus.Up &&
+                             ni.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                .Where(ni =>
+                {
+                    var name = ni.Name.ToLowerInvariant();
+                    var desc = ni.Description.ToLowerInvariant();
+                    return !name.Contains("vethernet") &&
+                           !name.Contains("virtual") &&
+                           !name.Contains("wsl") &&
+                           !name.Contains("docker") &&
+                           !desc.Contains("virtual") &&
+                           !desc.Contains("hyper-v") &&
+                           !desc.Contains("wsl") &&
+                           !desc.Contains("vmware") &&
+                           !desc.Contains("virtualbox") &&
+                           !desc.Contains("pseudo");
+                })
+                .ToList();
+
+            // 1. Wi-Fi first
+            var wifi = validInterfaces.FirstOrDefault(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211);
+            if (wifi != null)
             {
-                return ip.ToString();
+                var addr = wifi.GetIPProperties().UnicastAddresses
+                    .FirstOrDefault(a => a.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
+                                         !IPAddress.IsLoopback(a.Address) &&
+                                         !a.Address.ToString().StartsWith("169.254."));
+                if (addr != null) return addr.Address.ToString();
+            }
+
+            // 2. Physical Ethernet
+            var eth = validInterfaces.FirstOrDefault(ni => ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet);
+            if (eth != null)
+            {
+                var addr = eth.GetIPProperties().UnicastAddresses
+                    .FirstOrDefault(a => a.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
+                                         !IPAddress.IsLoopback(a.Address) &&
+                                         !a.Address.ToString().StartsWith("169.254."));
+                if (addr != null) return addr.Address.ToString();
+            }
+
+            var fallback = Dns.GetHostAddresses(Dns.GetHostName())
+                .FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
+                                     !IPAddress.IsLoopback(a) &&
+                                     !a.ToString().StartsWith("169.254.") &&
+                                     !a.ToString().StartsWith("172.31."));
+            if (fallback != null)
+            {
+                return fallback.ToString();
             }
         }
         catch

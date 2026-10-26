@@ -62,6 +62,7 @@ public partial class App : Application
             _mainViewModel = new MainViewModel(config, discoveryService, securityService, certService, printProcessor, queueService, apiHost);
 
             var mainWindow = new MainWindow { DataContext = _mainViewModel };
+            MainWindow = mainWindow;
             mainWindow.Show();
 
             // Auto-start API server on launch
