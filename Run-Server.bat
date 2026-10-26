@@ -2,21 +2,15 @@
 title KKR Wireless Print Server
 cd /d "%~dp0"
 
-tasklist /FI "IMAGENAME eq KKR.PrintServer.App.exe" 2>NUL | find /I "KKR.PrintServer.App.exe" >NUL
-if %ERRORLEVEL% equ 0 (
-    echo ==========================================================
-    echo   KKR Wireless Print Server is ALREADY RUNNING.
-    echo   Bringing existing window to the front...
-    echo ==========================================================
-    powershell -NoProfile -Command "$wshell = New-Object -ComObject WScript.Shell; $wshell.AppActivate('KKR Wireless Print')" >NUL 2>&1
-    exit /b 0
-)
-
 echo ==========================================================
 echo   Starting KKR Wireless Print Server...
 echo ==========================================================
 
-REM 1. Check KKR_Print_Server folder
+REM 1. Stop any old or background instances
+taskkill /F /IM KKR.PrintServer.App.exe >NUL 2>&1
+timeout /t 1 /nobreak >NUL
+
+REM 2. Check KKR_Print_Server folder
 if exist "%~dp0KKR_Print_Server\KKR.PrintServer.App.exe" (
     cd /d "%~dp0KKR_Print_Server"
     start "" "KKR.PrintServer.App.exe"

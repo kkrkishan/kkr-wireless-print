@@ -12,42 +12,29 @@ namespace KKR.PrintServer.App;
 
 public partial class App : Application
 {
-    private static Mutex? _mutex;
-    private const string MutexName = "Local\\KKR_Wireless_Print_Server_SingleInstance";
-
-    [DllImport("user32.dll")]
-    private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-    [DllImport("user32.dll")]
-    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-    private const int SW_RESTORE = 9;
-
     private MainViewModel? _mainViewModel;
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
-        _mutex = new Mutex(true, MutexName, out bool isNewInstance);
-        if (!isNewInstance)
+        // Ensure only this instance runs: terminate any old or orphaned background instances
+        try
         {
-            // Another instance is already running; activate its window and exit
-            try
-            {
-                var current = System.Diagnostics.Process.GetCurrentProcess();
-                foreach (var process in System.Diagnostics.Process.GetProcessesByName(current.ProcessName))
-                {
-                    if (process.Id != current.Id && process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        ShowWindow(process.MainWindowHandle, SW_RESTORE);
-                        SetForegroundWindow(process.MainWindowHandle);
-                        break;
-                    }
-                }
-            }
-            catch { }
+            var current = System.Diagnostics.Process.GetCurrentProcess();
+            var existing = System.Diagnostics.Process.GetProcessesByName(current.ProcessName)
+                .Where(p => p.Id != current.Id)
+                .ToList();
 
-            Shutdown();
-            return;
+            foreach (var p in existing)
+            {
+                try
+                {
+                    p.Kill();
+                    p.WaitForExit(1000);
+                }
+                catch { }
+            }
         }
+        catch { }
 
         AppDomain.CurrentDomain.UnhandledException += (s, args) =>
         {
@@ -117,14 +104,6 @@ public partial class App : Application
             await _mainViewModel.StopServerAsync();
         }
         AppLogger.Instance.Info("App", "KKR Wireless Print Server shut down cleanly.");
-
-        if (_mutex != null)
-        {
-            try { _mutex.ReleaseMutex(); } catch { }
-            _mutex.Dispose();
-            _mutex = null;
-        }
-
         base.OnExit(e);
     }
 }
