@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>KKR.PrintServer.App</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KKR.PrintServer.Core\KKR.PrintServer.Core.csproj" />
+    <ProjectReference Include="..\KKR.PrintServer.Api\KKR.PrintServer.Api.csproj" />
+  </ItemGroup>
+</Project>

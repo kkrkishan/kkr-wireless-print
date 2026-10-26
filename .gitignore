@@ -1,0 +1,15 @@
+# Build and cache outputs
+bin/
+obj/
+.nuget/
+.dotnet_cli/
+.appdata/
+*.log
+*.tmp
+crash.txt
+temp_spool/
+certs/
+
+# Published standalone folder
+KKR_Print_Server/
+publish/

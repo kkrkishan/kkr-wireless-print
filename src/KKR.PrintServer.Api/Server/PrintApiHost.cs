@@ -1,0 +1,158 @@
+using System.Net;
+using KKR.PrintServer.Api.Endpoints;
+using KKR.PrintServer.Api.Middleware;
+using KKR.PrintServer.Core.Logging;
+using KKR.PrintServer.Core.Models;
+using KKR.PrintServer.Core.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+namespace KKR.PrintServer.Api.Server;
+
+public class PrintApiHost
+{
+    private readonly ServerConfig _config;
+    private readonly ISecurityService _securityService;
+    private readonly ICertificateService _certificateService;
+    private readonly IPrinterDiscoveryService _printerService;
+    private readonly IJobQueueService _queueService;
+
+    private WebApplication? _app;
+    private CancellationTokenSource? _hostCts;
+
+    public bool IsRunning => _app != null;
+    public string? HttpUrl { get; private set; }
+    public string? HttpsUrl { get; private set; }
+
+    public PrintApiHost(
+        ServerConfig config,
+        ISecurityService securityService,
+        ICertificateService certificateService,
+        IPrinterDiscoveryService printerService,
+        IJobQueueService queueService)
+    {
+        _config = config;
+        _securityService = securityService;
+        _certificateService = certificateService;
+        _printerService = printerService;
+        _queueService = queueService;
+    }
+
+    public async Task StartAsync(CancellationToken cancellationToken = default)
+    {
+        if (IsRunning)
+        {
+            return;
+        }
+
+        var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions
+        {
+            EnvironmentName = Environments.Production
+        });
+
+        // Register routing and core singletons into DI
+        builder.Services.AddRouting();
+        builder.Services.AddSingleton(_config);
+        builder.Services.AddSingleton(_securityService);
+        builder.Services.AddSingleton(_certificateService);
+        builder.Services.AddSingleton(_printerService);
+        builder.Services.AddSingleton(_queueService);
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+        });
+
+        // Configure Kestrel
+        builder.WebHost.UseKestrel(kestrelOptions =>
+        {
+            IPAddress bindIp = IPAddress.Any;
+            if (!string.IsNullOrWhiteSpace(_config.ListenIpAddress) &&
+                IPAddress.TryParse(_config.ListenIpAddress, out var parsedIp))
+            {
+                bindIp = parsedIp;
+            }
+
+            if (_config.EnableHttpFallback)
+            {
+                kestrelOptions.Listen(bindIp, _config.HttpPort);
+            }
+
+            if (_config.EnableHttps)
+            {
+                var cert = _certificateService.GetOrCreateServerCertificate(
+                    new[] { "localhost", Environment.MachineName },
+                    new[] { _config.ListenIpAddress, "127.0.0.1" });
+
+                kestrelOptions.Listen(bindIp, _config.HttpsPort, listenOptions =>
+                {
+                    listenOptions.UseHttps(cert);
+                });
+            }
+
+            kestrelOptions.Limits.MaxRequestBodySize = _config.MaxUploadSizeBytes;
+        });
+
+        _app = builder.Build();
+
+        _app.UseCors();
+        _app.UseMiddleware<TokenAuthenticationMiddleware>();
+
+        // Map Endpoints
+        _app.MapDiscoveryEndpoints();
+        _app.MapAuthEndpoints();
+        _app.MapPrinterEndpoints();
+        _app.MapJobEndpoints(_config);
+
+        _hostCts = new CancellationTokenSource();
+        await _app.StartAsync(_hostCts.Token);
+
+        HttpUrl = _config.EnableHttpFallback ? $"http://{GetDisplayIp()}:{_config.HttpPort}" : null;
+        HttpsUrl = _config.EnableHttps ? $"https://{GetDisplayIp()}:{_config.HttpsPort}" : null;
+
+        AppLogger.Instance.Info("Host", $"Print Server API started. HTTP: {HttpUrl ?? "Disabled"}, HTTPS: {HttpsUrl ?? "Disabled"}");
+    }
+
+    public async Task StopAsync()
+    {
+        if (_app != null)
+        {
+            await _app.StopAsync();
+            await _app.DisposeAsync();
+            _app = null;
+        }
+        if (_hostCts != null)
+        {
+            _hostCts.Dispose();
+            _hostCts = null;
+        }
+        AppLogger.Instance.Info("Host", "Print Server API stopped.");
+    }
+
+    private string GetDisplayIp()
+    {
+        if (_config.ListenIpAddress != "0.0.0.0" && !string.IsNullOrWhiteSpace(_config.ListenIpAddress))
+        {
+            return _config.ListenIpAddress;
+        }
+
+        try
+        {
+            var ip = Dns.GetHostAddresses(Dns.GetHostName())
+                .FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !IPAddress.IsLoopback(a));
+            if (ip != null)
+            {
+                return ip.ToString();
+            }
+        }
+        catch
+        {
+            // Ignore
+        }
+
+        return "127.0.0.1";
+    }
+}

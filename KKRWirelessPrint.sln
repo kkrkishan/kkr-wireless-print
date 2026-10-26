@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F0F83512-627B-49A3-AA27-7428C9F8352C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKR.PrintServer.Core", "src\KKR.PrintServer.Core\KKR.PrintServer.Core.csproj", "{81488824-5166-40A3-90F6-BEF5AA949302}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKR.PrintServer.Api", "src\KKR.PrintServer.Api\KKR.PrintServer.Api.csproj", "{135F6C61-EB36-473D-AF10-5A13B44C55B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKR.PrintServer.App", "src\KKR.PrintServer.App\KKR.PrintServer.App.csproj", "{E85D44D0-01F4-4F6B-8483-0E8E0A2CC2FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7FABD26C-68C3-4D40-98FD-78FFBFFCD825}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKR.PrintServer.Tests", "tests\KKR.PrintServer.Tests\KKR.PrintServer.Tests.csproj", "{9C81AA02-888B-48D5-A91A-62A996A5464E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81488824-5166-40A3-90F6-BEF5AA949302}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81488824-5166-40A3-90F6-BEF5AA949302}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81488824-5166-40A3-90F6-BEF5AA949302}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81488824-5166-40A3-90F6-BEF5AA949302}.Release|Any CPU.Build.0 = Release|Any CPU
+		{135F6C61-EB36-473D-AF10-5A13B44C55B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{135F6C61-EB36-473D-AF10-5A13B44C55B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{135F6C61-EB36-473D-AF10-5A13B44C55B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{135F6C61-EB36-473D-AF10-5A13B44C55B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E85D44D0-01F4-4F6B-8483-0E8E0A2CC2FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E85D44D0-01F4-4F6B-8483-0E8E0A2CC2FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E85D44D0-01F4-4F6B-8483-0E8E0A2CC2FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E85D44D0-01F4-4F6B-8483-0E8E0A2CC2FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C81AA02-888B-48D5-A91A-62A996A5464E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C81AA02-888B-48D5-A91A-62A996A5464E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C81AA02-888B-48D5-A91A-62A996A5464E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C81AA02-888B-48D5-A91A-62A996A5464E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{81488824-5166-40A3-90F6-BEF5AA949302} = {F0F83512-627B-49A3-AA27-7428C9F8352C}
+		{135F6C61-EB36-473D-AF10-5A13B44C55B3} = {F0F83512-627B-49A3-AA27-7428C9F8352C}
+		{E85D44D0-01F4-4F6B-8483-0E8E0A2CC2FE} = {F0F83512-627B-49A3-AA27-7428C9F8352C}
+		{9C81AA02-888B-48D5-A91A-62A996A5464E} = {7FABD26C-68C3-4D40-98FD-78FFBFFCD825}
+	EndGlobalSection
+EndGlobal
