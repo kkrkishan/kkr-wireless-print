@@ -14,6 +14,9 @@ certs/
 # Published standalone folder
 KKR_Print_Server/
 publish/
+build/
+dist/*.exe
+dist/*.zip
 
 # Android build cache and binaries
 android_client/.gradle/

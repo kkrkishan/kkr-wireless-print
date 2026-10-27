@@ -1,3 +1,5 @@
+using KKR.PrintServer.Core.Common;
+
 namespace KKR.PrintServer.Core.Models;
 
 public class PairRequest
@@ -38,7 +40,7 @@ public class ServerConfig
     public bool EnableHttpFallback { get; set; } = true;
     public long MaxUploadSizeBytes { get; set; } = 52_428_800; // 50 MB
     public int PinExpiryMinutes { get; set; } = 15;
-    public string SpoolTempDirectory { get; set; } = Path.Combine(AppContext.BaseDirectory, "temp_spool");
-    public string CertDirectory { get; set; } = Path.Combine(AppContext.BaseDirectory, "certs");
-    public string LogDirectory { get; set; } = Path.Combine(AppContext.BaseDirectory, "logs");
+    public string SpoolTempDirectory { get; set; } = AppEnvironment.SpoolDirectory;
+    public string CertDirectory { get; set; } = AppEnvironment.CertsDirectory;
+    public string LogDirectory { get; set; } = AppEnvironment.LogsDirectory;
 }

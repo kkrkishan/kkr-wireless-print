@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows;
 using KKR.PrintServer.Api.Server;
 using KKR.PrintServer.App.ViewModels;
+using KKR.PrintServer.Core.Common;
 using KKR.PrintServer.Core.Logging;
 using KKR.PrintServer.Core.Models;
 using KKR.PrintServer.Core.Services;
@@ -39,27 +40,27 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += (s, args) =>
         {
             string err = args.ExceptionObject?.ToString() ?? "Unknown AppDomain error";
-            try { File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "crash.txt"), err); } catch { }
+            try { File.AppendAllText(AppEnvironment.CrashLogPath, err); } catch { }
             MessageBox.Show(err, "Fatal Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
         };
 
         DispatcherUnhandledException += (s, args) =>
         {
             string err = args.Exception?.ToString() ?? "Unknown Dispatcher error";
-            try { File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "crash.txt"), err); } catch { }
+            try { File.AppendAllText(AppEnvironment.CrashLogPath, err); } catch { }
             MessageBox.Show(err, "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
         };
 
         try
         {
-            string baseDir = AppContext.BaseDirectory;
-            string logsDir = Path.Combine(baseDir, "logs");
-            string certsDir = Path.Combine(baseDir, "certs");
-            string spoolDir = Path.Combine(baseDir, "temp_spool");
+            string dataDir = AppEnvironment.GetDataDirectory();
+            string logsDir = AppEnvironment.LogsDirectory;
+            string certsDir = AppEnvironment.CertsDirectory;
+            string spoolDir = AppEnvironment.SpoolDirectory;
 
             AppLogger.Instance.Initialize(logsDir);
-            AppLogger.Instance.Info("App", "KKR Wireless Print Server starting up...");
+            AppLogger.Instance.Info("App", $"KKR Wireless Print Server starting up... (Mode: {(AppEnvironment.IsPortableMode() ? "Portable" : "Installed")}, Data: {dataDir})");
 
             var config = new ServerConfig
             {
@@ -92,7 +93,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            try { File.AppendAllText(Path.Combine(AppContext.BaseDirectory, "crash.txt"), ex.ToString()); } catch { }
+            try { File.AppendAllText(AppEnvironment.CrashLogPath, ex.ToString()); } catch { }
             MessageBox.Show(ex.ToString(), "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }

@@ -17,7 +17,14 @@ if exist "%~dp0KKR_Print_Server\KKR.PrintServer.App.exe" (
     exit /b 0
 )
 
-REM 2. Check publish folder
+REM 3. Check self-contained release publish folder
+if exist "%~dp0build\publish\win-x64\KKR.PrintServer.App.exe" (
+    cd /d "%~dp0build\publish\win-x64"
+    start "" "KKR.PrintServer.App.exe"
+    exit /b 0
+)
+
+REM 4. Check legacy publish folder
 if exist "%~dp0publish\KKR.PrintServer.App.exe" (
     cd /d "%~dp0publish"
     start "" "KKR.PrintServer.App.exe"

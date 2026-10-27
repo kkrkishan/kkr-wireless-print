@@ -4,7 +4,20 @@
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>KKR.PrintServer.App</RootNamespace>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <AssemblyName>KKR.PrintServer.App</AssemblyName>
+    <Product>KKR Wireless Print</Product>
+    <Description>KKR Wireless Print Server for Windows</Description>
+    <Company>KKR Education</Company>
+    <Copyright>Copyright © 2026 KKR</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

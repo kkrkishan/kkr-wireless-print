@@ -1,3 +1,5 @@
+using KKR.PrintServer.Core.Common;
+
 namespace KKR.PrintServer.Core.Logging;
 
 public enum LogLevel
@@ -29,7 +31,7 @@ public class AppLogger
     public static AppLogger Instance => _instance.Value;
 
     private readonly object _lock = new();
-    private string _logDirectory = Path.Combine(AppContext.BaseDirectory, "logs");
+    private string _logDirectory = AppEnvironment.LogsDirectory;
     private readonly List<LogEntry> _recentEntries = new();
     private const int MaxMemoryEntries = 500;
 
