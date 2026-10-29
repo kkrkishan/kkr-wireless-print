@@ -32,6 +32,56 @@ class Program
         string wizSmall = Path.Combine(installerDir, "wizard_small.bmp");
         CreateWizardSmall(wizSmall);
         Console.WriteLine($"Generated wizard_small.bmp at {wizSmall}");
+
+        string storeDir = Path.Combine(rootDir, "store_assets");
+        Directory.CreateDirectory(storeDir);
+        GenerateStoreAssets(storeDir);
+        Console.WriteLine($"Generated Microsoft Store assets in {storeDir}");
+    }
+
+    static void GenerateStoreAssets(string dir)
+    {
+        // Store Logo (300x300 PNG)
+        using (var bmp = DrawIcon(300))
+        {
+            bmp.Save(Path.Combine(dir, "StoreLogo.png"), ImageFormat.Png);
+        }
+
+        // Square 150x150 Logo
+        using (var bmp = DrawIcon(150))
+        {
+            bmp.Save(Path.Combine(dir, "Square150x150Logo.png"), ImageFormat.Png);
+        }
+
+        // Square 44x44 Logo
+        using (var bmp = DrawIcon(44))
+        {
+            bmp.Save(Path.Combine(dir, "Square44x44Logo.png"), ImageFormat.Png);
+        }
+
+        // Wide 310x150 Tile
+        using (var bmp = new Bitmap(310, 150, PixelFormat.Format32bppArgb))
+        using (var g = Graphics.FromImage(bmp))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            using (var brush = new LinearGradientBrush(new Rectangle(0, 0, 310, 150), Color.FromArgb(255, 15, 23, 42), Color.FromArgb(255, 30, 58, 138), 45f))
+            {
+                g.FillRectangle(brush, 0, 0, 310, 150);
+            }
+            using (var icon = DrawIcon(96))
+            {
+                g.DrawImage(icon, 18, 27, 96, 96);
+            }
+            using (var font = new Font("Segoe UI", 12f, FontStyle.Bold))
+            using (var subFont = new Font("Segoe UI", 9f, FontStyle.Regular))
+            using (var whiteBrush = new SolidBrush(Color.White))
+            using (var cyanBrush = new SolidBrush(Color.FromArgb(255, 56, 189, 248)))
+            {
+                g.DrawString("KKR Wireless Print", font, whiteBrush, 124, 46);
+                g.DrawString("Windows Print Server", subFont, cyanBrush, 124, 72);
+            }
+            bmp.Save(Path.Combine(dir, "Wide310x150Logo.png"), ImageFormat.Png);
+        }
     }
 
     static Bitmap DrawIcon(int size)
