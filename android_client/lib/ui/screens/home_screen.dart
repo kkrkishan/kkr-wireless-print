@@ -311,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: AppTheme.lightBlue, size: 22),
             ),
             const SizedBox(width: 10),
-            const Text('KKR Wireless Print'),
+            const Text('Print Ofo'),
           ],
         ),
         actions: [

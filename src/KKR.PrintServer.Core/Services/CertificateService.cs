@@ -72,7 +72,7 @@ public class CertificateService : ICertificateService
         AppLogger.Instance.Info("Security", "Generating new self-signed TLS certificate for local network...");
 
         using var rsa = RSA.Create(2048);
-        var subject = new X500DistinguishedName("CN=KKR-Wireless-Print-Server, O=KKR Wireless Print, OU=Print Services");
+        var subject = new X500DistinguishedName("CN=Print-Ofo-Server, O=Print Ofo, OU=Print Services");
         var request = new CertificateRequest(subject, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
 
         // Basic Constraints: End-entity

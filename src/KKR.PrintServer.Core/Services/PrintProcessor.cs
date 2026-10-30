@@ -239,7 +239,7 @@ public class PrintProcessor : IPrintProcessor
     private static void ConfigurePrintDocumentSettings(PrintDocument printDoc, PrintJobRecord record, PrinterInfo? printerInfo)
     {
         printDoc.PrinterSettings.PrinterName = record.PrinterName;
-        printDoc.DocumentName = string.IsNullOrWhiteSpace(record.DocumentName) ? "KKR_Wireless_Print_Job" : record.DocumentName;
+        printDoc.DocumentName = string.IsNullOrWhiteSpace(record.DocumentName) ? "Print_Ofo_Job" : record.DocumentName;
 
         // Copies
         int copies = Math.Clamp(record.Request.Copies, 1, printerInfo?.Capabilities.MaxCopies ?? 99);

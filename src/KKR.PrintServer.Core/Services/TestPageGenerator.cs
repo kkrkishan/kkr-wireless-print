@@ -30,7 +30,7 @@ public static class TestPageGenerator
 
         using var titleFont = new Font("Arial", 42, FontStyle.Bold);
         using var whiteBrush = new SolidBrush(Color.White);
-        g.DrawString("KKR WIRELESS PRINT", titleFont, whiteBrush, 200, 190);
+        g.DrawString("PRINT OFO", titleFont, whiteBrush, 200, 190);
 
         using var subFont = new Font("Arial", 20, FontStyle.Regular);
         using var yellowBrush = new SolidBrush(Color.FromArgb(255, 215, 0));
@@ -127,7 +127,7 @@ public static class TestPageGenerator
         // Footer note
         using var footerFont = new Font("Arial", 16, FontStyle.Italic);
         using var footerBrush = new SolidBrush(Color.FromArgb(100, 100, 100));
-        string footerText = "KKR Wireless Print — Verified Windows Spooler Pipeline & Hardware Driver Communication";
+        string footerText = "Print Ofo — Verified Windows Spooler Pipeline & Hardware Driver Communication";
         var footerSize = g.MeasureString(footerText, footerFont);
         g.DrawString(footerText, footerFont, footerBrush, (width - footerSize.Width) / 2, height - 220);
 

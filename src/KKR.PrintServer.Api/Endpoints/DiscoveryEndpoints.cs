@@ -15,7 +15,7 @@ public static class DiscoveryEndpoints
             var printers = printerService.GetPrinters();
             return Results.Ok(new
             {
-                serverName = "KKR Wireless Print Server",
+                serverName = "Print Ofo Server",
                 version = "1.0.0",
                 machineName = Environment.MachineName,
                 requiresPairing = true,

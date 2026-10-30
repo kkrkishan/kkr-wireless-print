@@ -5,7 +5,7 @@ namespace KKR.PrintServer.Core.Common;
 
 /// <summary>
 /// Resolves safe application data paths ensuring clean separation between
-/// read-only application binaries (e.g. C:\Program Files\KKR Wireless Print)
+/// read-only application binaries (e.g. C:\Program Files\Print Ofo)
 /// and user/runtime data (logs, certs, temp spool, crashes).
 /// In portable mode, keeps data in the application directory.
 /// </summary>
@@ -16,7 +16,7 @@ public static class AppEnvironment
 
     /// <summary>
     /// Gets the application writable data directory.
-    /// When installed in Program Files, returns %LocalAppData%\KKR_Wireless_Print.
+    /// When installed in Program Files, returns %LocalAppData%\Print_Ofo.
     /// When running portable (or in dev folder with write permissions), returns AppContext.BaseDirectory.
     /// </summary>
     public static string GetDataDirectory()
@@ -47,7 +47,7 @@ public static class AppEnvironment
             if (isInProgramFiles)
             {
                 string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                string dataDir = Path.Combine(localAppData, "KKR_Wireless_Print");
+                string dataDir = Path.Combine(localAppData, "Print_Ofo");
                 EnsureDirectory(dataDir);
                 _dataDirectory = dataDir;
                 return _dataDirectory;
@@ -68,7 +68,7 @@ public static class AppEnvironment
             {
                 // Not writable -> fallback to LocalAppData
                 string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                string dataDir = Path.Combine(localAppData, "KKR_Wireless_Print");
+                string dataDir = Path.Combine(localAppData, "Print_Ofo");
                 EnsureDirectory(dataDir);
                 _dataDirectory = dataDir;
                 return _dataDirectory;

@@ -60,7 +60,7 @@ public partial class App : Application
             string spoolDir = AppEnvironment.SpoolDirectory;
 
             AppLogger.Instance.Initialize(logsDir);
-            AppLogger.Instance.Info("App", $"KKR Wireless Print Server starting up... (Mode: {(AppEnvironment.IsPortableMode() ? "Portable" : "Installed")}, Data: {dataDir})");
+            AppLogger.Instance.Info("App", $"Print Ofo Server starting up... (Mode: {(AppEnvironment.IsPortableMode() ? "Portable" : "Installed")}, Data: {dataDir})");
 
             var config = new ServerConfig
             {
@@ -104,7 +104,7 @@ public partial class App : Application
         {
             await _mainViewModel.StopServerAsync();
         }
-        AppLogger.Instance.Info("App", "KKR Wireless Print Server shut down cleanly.");
+        AppLogger.Instance.Info("App", "Print Ofo Server shut down cleanly.");
         base.OnExit(e);
     }
 }

@@ -25,16 +25,16 @@ void main() async {
   // Initialize persistent storage
   await StorageService().init();
 
-  runApp(const KkrWirelessPrintApp());
+  runApp(const PrintOfoApp());
 }
 
-class KkrWirelessPrintApp extends StatelessWidget {
-  const KkrWirelessPrintApp({super.key});
+class PrintOfoApp extends StatelessWidget {
+  const PrintOfoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'KKR Wireless Print',
+      title: 'Print Ofo',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       home: const HomeScreen(),

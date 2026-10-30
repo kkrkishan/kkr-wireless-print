@@ -5,11 +5,11 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>KKR.PrintServer.App</RootNamespace>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <AssemblyName>KKR.PrintServer.App</AssemblyName>
-    <Product>KKR Wireless Print</Product>
-    <Description>KKR Wireless Print Server for Windows</Description>
-    <Company>KKR Education</Company>
-    <Copyright>Copyright © 2026 KKR</Copyright>
+    <AssemblyName>PrintOfo.Server</AssemblyName>
+    <Product>Print Ofo</Product>
+    <Description>Print Ofo — Windows Print Server</Description>
+    <Company>Print Ofo</Company>
+    <Copyright>Copyright © 2026 Print Ofo</Copyright>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <Version>1.0.0</Version>

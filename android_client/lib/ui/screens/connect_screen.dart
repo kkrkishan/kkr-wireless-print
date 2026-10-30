@@ -281,7 +281,7 @@ class _ConnectScreenState extends State<ConnectScreen>
               SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Point camera at the QR code displayed on the Windows KKR Print Server dashboard.',
+                  'Point camera at the QR code displayed on the Windows Print Ofo Server dashboard.',
                   style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
                 ),
               ),
@@ -386,7 +386,7 @@ class _ConnectScreenState extends State<ConnectScreen>
             ),
             const SizedBox(height: 6),
             const Text(
-              'Find these details on the KKR Wireless Print dashboard on your Windows laptop.',
+              'Find these details on the Print Ofo dashboard on your Windows laptop.',
               style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
             ),
             const SizedBox(height: 20),
@@ -530,7 +530,7 @@ class _ConnectScreenState extends State<ConnectScreen>
                   Text(
                     '• Ensure phone and laptop are on the same Wi-Fi router / mobile hotspot.\n'
                     '• On Windows, check that Private network firewall rule is active.\n'
-                    '• Make sure the KKR Wireless Print Server is running on the laptop.\n'
+                    '• Make sure the Print Ofo Server is running on the laptop.\n'
                     '• Some public/guest Wi-Fi isolate devices (client isolation). Use a home network or phone hotspot.',
                     style: TextStyle(fontSize: 11, color: AppTheme.textMuted, height: 1.4),
                   ),

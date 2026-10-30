@@ -14,7 +14,7 @@ void main() {
         pin: '123456',
         thumbprint: 'AABBCCDDEEFF',
         token: 'test-jwt-token',
-        serverName: 'KKR Wireless Print Server',
+        serverName: 'Print Ofo Server',
       );
 
       final json = conn.toJson();

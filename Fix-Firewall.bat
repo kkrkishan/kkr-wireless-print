@@ -11,18 +11,18 @@ if %errorlevel% neq 0 (
 )
 
 echo ==========================================================
-echo   KKR Wireless Print - Firewall ^& Network Auto-Fix
+echo   Print Ofo - Firewall ^& Network Auto-Fix
 echo ==========================================================
 echo.
 
-set "APP_EXE=%~dp0KKR.PrintServer.App.exe"
+set "APP_EXE=%~dp0PrintOfo.Server.exe"
 if not exist "%APP_EXE%" (
-    if exist "%ProgramFiles%\KKR Wireless Print\KKR.PrintServer.App.exe" (
+    if exist "%ProgramFiles%\Print Ofo\PrintOfo.Server.exe" (
+        set "APP_EXE=%ProgramFiles%\Print Ofo\PrintOfo.Server.exe"
+    ) else if exist "%~dp0build\publish\win-x64\PrintOfo.Server.exe" (
+        set "APP_EXE=%~dp0build\publish\win-x64\PrintOfo.Server.exe"
+    ) else if exist "%ProgramFiles%\KKR Wireless Print\KKR.PrintServer.App.exe" (
         set "APP_EXE=%ProgramFiles%\KKR Wireless Print\KKR.PrintServer.App.exe"
-    ) else if exist "%~dp0KKR_Print_Server\KKR.PrintServer.App.exe" (
-        set "APP_EXE=%~dp0KKR_Print_Server\KKR.PrintServer.App.exe"
-    ) else if exist "%~dp0build\publish\win-x64\KKR.PrintServer.App.exe" (
-        set "APP_EXE=%~dp0build\publish\win-x64\KKR.PrintServer.App.exe"
     )
 )
 
@@ -33,12 +33,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
     "$wifiProfiles = Get-NetConnectionProfile | Where-Object { $_.InterfaceAlias -like '*Wi-Fi*' -or $_.InterfaceAlias -like '*WLAN*' }; " ^
     "foreach ($p in $wifiProfiles) { Set-NetConnectionProfile -Name $p.Name -NetworkCategory Private; Write-Host ('  Network ' + $p.Name + ' is now Private.') -ForegroundColor Green; }; " ^
     "Write-Host '[2/3] Opening TCP ports 8080 and 8443 on all firewall profiles...' -ForegroundColor Cyan; " ^
+    "Remove-NetFirewallRule -DisplayName 'Print Ofo*' -ErrorAction SilentlyContinue; " ^
     "Remove-NetFirewallRule -DisplayName 'KKR Wireless Print*' -ErrorAction SilentlyContinue; " ^
-    "New-NetFirewallRule -DisplayName 'KKR Wireless Print Server (Ports 8080, 8443)' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8080,8443 -Profile Any -Enabled True | Out-Null; " ^
+    "New-NetFirewallRule -DisplayName 'Print Ofo Server (Ports 8080, 8443)' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8080,8443 -Profile Any -Enabled True | Out-Null; " ^
     "Write-Host '  Ports 8080 and 8443 are now open for all profiles.' -ForegroundColor Green; " ^
-    "Write-Host '[3/3] Authorizing KKR.PrintServer.App.exe...' -ForegroundColor Cyan; " ^
+    "Write-Host '[3/3] Authorizing Print Ofo Server binary...' -ForegroundColor Cyan; " ^
     "if (Test-Path $appPath) { " ^
-    "    New-NetFirewallRule -DisplayName 'KKR Wireless Print Server App' -Direction Inbound -Action Allow -Program $appPath -Profile Any -Enabled True | Out-Null; " ^
+    "    New-NetFirewallRule -DisplayName 'Print Ofo Server App' -Direction Inbound -Action Allow -Program $appPath -Profile Any -Enabled True | Out-Null; " ^
     "    Write-Host ('  Application rule added for: ' + $appPath) -ForegroundColor Green; " ^
     "} else { " ^
     "    Write-Host '  Port rules successfully applied.' -ForegroundColor Yellow; " ^
@@ -52,7 +53,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
     "if ($ip) { Write-Host (' Laptop Wi-Fi IP Address : ' + $ip) -ForegroundColor Yellow; } " ^
     "Write-Host ' Laptop Port             : 8080' -ForegroundColor Yellow; " ^
     "Write-Host ''; " ^
-    "Write-Host 'Your mobile phone can now connect to this laptop!' -ForegroundColor White; "
+    "Write-Host 'Your mobile phone with Print Ofo can now connect to this laptop!' -ForegroundColor White; "
 
 echo.
 pause

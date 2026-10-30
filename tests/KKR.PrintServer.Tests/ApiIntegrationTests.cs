@@ -76,7 +76,7 @@ public class ApiIntegrationTests : IDisposable
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var json = await response.Content.ReadAsStringAsync();
-        Assert.Contains("KKR Wireless Print Server", json);
+        Assert.Contains("Print Ofo Server", json);
         Assert.Contains("supportedFormats", json);
     }
 

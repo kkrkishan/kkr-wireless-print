@@ -1,4 +1,4 @@
-# Build and cache outputs
+﻿# Build and cache outputs
 bin/
 obj/
 .nuget/
@@ -17,6 +17,7 @@ publish/
 build/
 dist/*.exe
 dist/*.zip
+dist/*.aab
 
 # Android build cache and binaries
 android_client/.gradle/
@@ -25,5 +26,9 @@ android_client/build/
 android_client/.dart_tool/
 accept-licenses.ps1
 *.apk
-
-
+*.aab
+*.keystore
+*.jks
+release/android/*.apk
+release/android/*.aab
+release/android/*.keystore

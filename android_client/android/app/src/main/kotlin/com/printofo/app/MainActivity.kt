@@ -1,4 +1,4 @@
-package com.kkr.wirelessprint.kkr_wireless_print
+package com.printofo.app
 
 import io.flutter.embedding.android.FlutterActivity
 
