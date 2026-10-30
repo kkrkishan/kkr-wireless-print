@@ -1,10 +1,12 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../models/server_connection.dart';
 import '../../services/api_service.dart';
 import '../../services/storage_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/desktop_companion_dialog.dart';
+import '../widgets/desktop_companion_dialog.dart';
 
 class ConnectScreen extends StatefulWidget {
   final ServerConnection? initialConnection;

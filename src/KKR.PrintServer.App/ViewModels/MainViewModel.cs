@@ -1,3 +1,4 @@
+﻿using KKR.PrintServer.Core.Common;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -41,6 +42,13 @@ public class MainViewModel : INotifyPropertyChanged
     private string _lastQrPin = string.Empty;
     private string _lastQrIp = string.Empty;
 
+    // Google Play Store Promo Popup State
+    private bool _isPlayStorePopupVisible;
+    private bool _dontShowPlayStorePopupAgain;
+    private BitmapSource? _playStoreQrCodeImage;
+    private const string PlayStoreUrl = "https://play.google.com/store/apps/details?id=com.printofo.app";
+    private readonly string _prefsFilePath;
+
     public MainViewModel(
         ServerConfig config,
         IPrinterDiscoveryService printerDiscovery,
@@ -73,6 +81,20 @@ public class MainViewModel : INotifyPropertyChanged
         OpenCertFolderCommand = new RelayCommand(OpenCertFolder);
         OpenLogsFolderCommand = new RelayCommand(OpenLogsFolder);
         ClearLogsCommand = new RelayCommand(ClearLogs);
+        ShowPlayStorePopupCommand = new RelayCommand(() => IsPlayStorePopupVisible = true);
+        ClosePlayStorePopupCommand = new RelayCommand(ClosePlayStorePopup);
+        OpenPlayStoreLinkCommand = new RelayCommand(OpenPlayStoreLink);
+        CopyPlayStoreLinkCommand = new RelayCommand(CopyPlayStoreLink);
+
+        _prefsFilePath = Path.Combine(AppEnvironment.GetDataDirectory(), "ui_preferences.json");
+        LoadPreferences();
+        GeneratePlayStoreQrCode();
+
+        // Show popup on startup if user has not opted out
+        if (!_dontShowPlayStorePopupAgain)
+        {
+            _isPlayStorePopupVisible = true;
+        }
 
         // Subscriptions
         _jobQueue.JobUpdated += OnJobUpdated;
@@ -168,6 +190,29 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand OpenCertFolderCommand { get; }
     public ICommand OpenLogsFolderCommand { get; }
     public ICommand ClearLogsCommand { get; }
+
+    public bool IsPlayStorePopupVisible
+    {
+        get => _isPlayStorePopupVisible;
+        set { _isPlayStorePopupVisible = value; OnPropertyChanged(); }
+    }
+
+    public bool DontShowPlayStorePopupAgain
+    {
+        get => _dontShowPlayStorePopupAgain;
+        set { _dontShowPlayStorePopupAgain = value; OnPropertyChanged(); }
+    }
+
+    public BitmapSource? PlayStoreQrCodeImage
+    {
+        get => _playStoreQrCodeImage;
+        private set { _playStoreQrCodeImage = value; OnPropertyChanged(); }
+    }
+
+    public ICommand ShowPlayStorePopupCommand { get; }
+    public ICommand ClosePlayStorePopupCommand { get; }
+    public ICommand OpenPlayStoreLinkCommand { get; }
+    public ICommand CopyPlayStoreLinkCommand { get; }
 
     public async Task StartServerAsync()
     {
@@ -593,6 +638,98 @@ public class MainViewModel : INotifyPropertyChanged
                                  !IPAddress.IsLoopback(a.Address) &&
                                  !a.Address.ToString().StartsWith("169.254."));
         return addr?.Address.ToString();
+    }
+
+    private void LoadPreferences()
+    {
+        try
+        {
+            if (File.Exists(_prefsFilePath))
+            {
+                var json = File.ReadAllText(_prefsFilePath);
+                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("dontShowPlayStorePopup", out var prop))
+                {
+                    _dontShowPlayStorePopupAgain = prop.GetBoolean();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Instance.Warning("UI", $"Could not load UI preferences: {ex.Message}");
+        }
+    }
+
+    private void SavePreferences()
+    {
+        try
+        {
+            var dir = Path.GetDirectoryName(_prefsFilePath);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            var obj = new { dontShowPlayStorePopup = _dontShowPlayStorePopupAgain };
+            File.WriteAllText(_prefsFilePath, System.Text.Json.JsonSerializer.Serialize(obj));
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Instance.Warning("UI", $"Could not save UI preferences: {ex.Message}");
+        }
+    }
+
+    private void ClosePlayStorePopup()
+    {
+        IsPlayStorePopupVisible = false;
+        SavePreferences();
+    }
+
+    private void OpenPlayStoreLink()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(PlayStoreUrl) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Instance.Error("UI", "Failed to open Play Store link", ex);
+        }
+    }
+
+    private void CopyPlayStoreLink()
+    {
+        try
+        {
+            Clipboard.SetText(PlayStoreUrl);
+            StatusMessage = "Google Play Store link copied to clipboard!";
+        }
+        catch { }
+    }
+
+    private void GeneratePlayStoreQrCode()
+    {
+        try
+        {
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrData = qrGenerator.CreateQrCode(PlayStoreUrl, QRCodeGenerator.ECCLevel.M);
+            using var qrCode = new PngByteQRCode(qrData);
+            byte[] qrBytes = qrCode.GetGraphic(8);
+
+            var bitmap = new BitmapImage();
+            using var stream = new MemoryStream(qrBytes);
+            bitmap.BeginInit();
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.StreamSource = stream;
+            bitmap.EndInit();
+            bitmap.Freeze();
+
+            PlayStoreQrCodeImage = bitmap;
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Instance.Error("UI", "Failed to generate Play Store QR code", ex);
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

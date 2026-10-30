@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +11,8 @@ import '../../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import 'connect_screen.dart';
 import 'preview_and_settings_screen.dart';
+import '../widgets/desktop_companion_dialog.dart';
+import '../widgets/desktop_companion_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

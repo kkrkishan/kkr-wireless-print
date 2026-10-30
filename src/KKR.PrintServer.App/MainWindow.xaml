@@ -70,6 +70,15 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- Get Android App Button -->
+                    <Button Content="📱 Get Android App"
+                            Command="{Binding ShowPlayStorePopupCommand}"
+                            Style="{StaticResource ModernButton}"
+                            Background="#0284C7"
+                            Margin="0,0,10,0"
+                            Padding="10,6"
+                            ToolTip="Show QR code &amp; link to download Print Ofo on Google Play Store" />
+
                     <!-- Toggle Server Button -->
                     <Button Command="{Binding ToggleServerCommand}">
                         <Button.Style>
@@ -164,6 +173,21 @@
                         </Grid>
 
                         <TextBlock Text="ðŸ“· Scan QR code with Print Ofo Android app, or enter PIN manually." FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,0,0,10" />
+
+                        <!-- Play Store Promo Card -->
+                        <Border Background="#1E293B" BorderBrush="#0284C7" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="📱 Need Print Ofo on Android?" FontWeight="Bold" FontSize="11" Foreground="#38BDF8" />
+                                    <TextBlock Text="Download free from Google Play Store" FontSize="10" Foreground="{StaticResource SecondaryText}" />
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="Get App QR" Command="{Binding ShowPlayStorePopupCommand}" Style="{StaticResource ModernButton}" Background="#0284C7" FontSize="10" Padding="8,4" />
+                            </Grid>
+                        </Border>
 
                         <Grid Margin="0,4,0,0">
                             <Grid.ColumnDefinitions>
@@ -505,6 +529,88 @@
                 <TextBlock Grid.Column="1" Text="Print Ofo v1.0.0 - Production Edition" FontSize="11" Foreground="#475569" />
             </Grid>
         </Border>
+
+        <!-- GOOGLE PLAY STORE POPUP OVERLAY -->
+        <Grid Grid.Row="0" Grid.RowSpan="4"
+              Visibility="{Binding IsPlayStorePopupVisible, Converter={StaticResource BoolToVis}}"
+              Background="#D0020617"
+              Panel.ZIndex="1000">
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Width="540" MaxWidth="580"
+                    Background="#0F172A" BorderBrush="#0284C7" BorderThickness="2"
+                    CornerRadius="14" Padding="24">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="30" ShadowDepth="0" Color="#0284C7" Opacity="0.4" />
+                </Border.Effect>
+                <StackPanel>
+                    <!-- Header -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Background="#0284C7" CornerRadius="6" Padding="8,4" Margin="0,0,12,0">
+                                <TextBlock Text="📱" FontSize="18" />
+                            </Border>
+                            <StackPanel>
+                                <TextBlock Text="Download Print Ofo for Android" FontSize="16" FontWeight="Bold" Foreground="White" />
+                                <TextBlock Text="Available on Google Play Store" FontSize="12" Foreground="#38BDF8" />
+                            </StackPanel>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="✕" Command="{Binding ClosePlayStorePopupCommand}"
+                                Background="Transparent" Foreground="#94A3B8" FontWeight="Bold" FontSize="14"
+                                BorderThickness="0" Cursor="Hand" Padding="8,4" />
+                    </Grid>
+
+                    <!-- Explanatory Text -->
+                    <TextBlock Text="To print photos, PDFs, and documents wirelessly from your phone to the USB printers connected to this computer, install the companion app on your Android device."
+                               TextWrapping="Wrap" FontSize="12" Foreground="#CBD5E1" LineHeight="18" Margin="0,0,0,16" />
+
+                    <!-- QR Code & Instructions Box -->
+                    <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- QR Code Box -->
+                            <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="6" Width="130" Height="130" Margin="0,0,16,0" VerticalAlignment="Center">
+                                <Image Source="{Binding PlayStoreQrCodeImage}" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                            </Border>
+
+                            <!-- Instructions & Direct Buttons -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="SCAN WITH PHONE CAMERA" FontSize="11" FontWeight="Bold" Foreground="#38BDF8" Margin="0,0,0,6" />
+                                <TextBlock Text="1. Open camera on your Android phone&#x0a;2. Point at this QR code to open Play Store&#x0a;3. Tap 'Install' and pair over local Wi-Fi"
+                                           FontSize="11" Foreground="#94A3B8" LineHeight="16" Margin="0,0,0,12" />
+
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Open in Browser" Command="{Binding OpenPlayStoreLinkCommand}"
+                                            Style="{StaticResource ModernButton}" Background="#0284C7" Padding="10,6" FontSize="11" Margin="0,0,8,0" />
+                                    <Button Content="📋 Copy Link" Command="{Binding CopyPlayStoreLinkCommand}"
+                                            Style="{StaticResource ModernButton}" Background="#334155" Padding="10,6" FontSize="11" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Footer: Checkbox & Close Button -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Content="Don't show this popup on startup"
+                                  IsChecked="{Binding DontShowPlayStorePopupAgain}"
+                                  Foreground="#94A3B8" FontSize="11" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Content="Got it, Continue" Command="{Binding ClosePlayStorePopupCommand}"
+                                Style="{StaticResource ModernButton}" Background="#10B981" Padding="16,6" FontSize="12" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
 

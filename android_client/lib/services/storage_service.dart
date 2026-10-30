@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/server_connection.dart';
 import '../models/print_job.dart';
@@ -106,5 +106,16 @@ class StorageService {
       );
       await saveRecentJobs(jobs);
     }
+  }
+  static const String _keyDismissDesktopPromo = 'dismiss_desktop_promo';
+
+  Future<void> saveDismissDesktopPromo(bool dismiss) async {
+    await init();
+    await _prefs!.setBool(_keyDismissDesktopPromo, dismiss);
+  }
+
+  Future<bool> loadDismissDesktopPromo() async {
+    await init();
+    return _prefs!.getBool(_keyDismissDesktopPromo) ?? false;
   }
 }

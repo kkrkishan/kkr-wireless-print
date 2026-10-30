@@ -1,3 +1,7 @@
+﻿import 'package:flutter/material.dart';
+import 'package:kkr_wireless_print/ui/widgets/desktop_companion_dialog.dart';
+import 'package:kkr_wireless_print/ui/widgets/desktop_companion_dialog.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kkr_wireless_print/models/server_connection.dart';
 import 'package:kkr_wireless_print/models/printer_info.dart';
@@ -134,6 +138,25 @@ void main() {
       expect(map['scalingMode'], 'FitPage');
       expect(map['centerOnPage'], 'true');
       expect(map['idempotencyKey'], 'key-123');
+    });
+  });
+  group('DesktopCompanionDialog Tests', () {
+    testWidgets('Renders Microsoft Store information and options', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: DesktopCompanionDialog(autoOpened: true),
+          ),
+        ),
+      );
+
+      expect(find.text('Print Ofo for Windows'), findsOneWidget);
+      expect(find.text('Available on Microsoft Store'), findsOneWidget);
+      expect(find.text('Get from Microsoft Store'), findsOneWidget);
+      expect(find.text('Share to PC'), findsOneWidget);
+      expect(find.text('Copy Link'), findsOneWidget);
+      expect(find.text("Don't show this popup on startup"), findsOneWidget);
+      expect(find.text('I already have it running → Connect'), findsOneWidget);
     });
   });
 }
