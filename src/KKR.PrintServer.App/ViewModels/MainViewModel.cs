@@ -32,6 +32,7 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly DispatcherTimer _refreshTimer;
 
     private bool _isServerRunning;
+    private bool _isAutoStartEnabled;
     private string _currentPin = string.Empty;
     private string _pinExpiryText = string.Empty;
     private string _serverIp = "127.0.0.1";
@@ -110,12 +111,28 @@ public class MainViewModel : INotifyPropertyChanged
         _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _refreshTimer.Tick += (s, e) => OnTimerTick();
         _refreshTimer.Start();
+        _isAutoStartEnabled = AutoStartupService.IsAutoStartEnabled();
     }
 
     public ObservableCollection<PrinterItemViewModel> Printers { get; }
     public ObservableCollection<JobItemViewModel> Jobs { get; }
     public ObservableCollection<LogEntry> Logs { get; }
     public ObservableCollection<PairedClient> PairedClients { get; }
+
+    public bool IsAutoStartEnabled
+    {
+        get => _isAutoStartEnabled;
+        set
+        {
+            if (_isAutoStartEnabled != value)
+            {
+                _isAutoStartEnabled = value;
+                AutoStartupService.SetAutoStart(value);
+                OnPropertyChanged();
+                StatusMessage = value ? "Print Ofo will run automatically on Windows startup." : "Auto-startup disabled.";
+            }
+        }
+    }
 
     public bool IsServerRunning
     {

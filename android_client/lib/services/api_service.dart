@@ -1,3 +1,5 @@
+﻿import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -39,7 +41,7 @@ class ApiService {
       sendTimeout: const Duration(seconds: 60),
     ));
 
-    // Trust self-signed certificates on local network (for Phase 1 HTTPS)
+    // Trust self-signed certificates on local network (for HTTPS)
     _dio.httpClientAdapter = IOHttpClientAdapter(
       createHttpClient: () {
         final client = HttpClient();
@@ -67,6 +69,96 @@ class ApiService {
   ServerConnection? get currentConnection => _currentConnection;
   bool get isAuthenticated => _authToken != null && _authToken!.isNotEmpty;
   String get activeBaseUrl => _activeBaseUrl;
+
+  /// Discover Print Ofo Windows Server on local Wi-Fi via UDP broadcast (port 8089)
+  Future<Map<String, dynamic>?> discoverServer({
+    Duration timeout = const Duration(seconds: 3),
+  }) async {
+    RawDatagramSocket? socket;
+    try {
+      socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
+      socket.broadcastEnabled = true;
+
+      final completer = Completer<Map<String, dynamic>?>();
+      final probeBytes = utf8.encode('PRINT_OFO_DISCOVER');
+
+      // Send to broadcast address
+      socket.send(probeBytes, InternetAddress('255.255.255.255'), 8089);
+
+      final timer = Timer(timeout, () {
+        if (!completer.isCompleted) {
+          completer.complete(null);
+        }
+      });
+
+      socket.listen((event) {
+        if (event == RawSocketEvent.read && socket != null) {
+          final datagram = socket.receive();
+          if (datagram != null) {
+            try {
+              final text = utf8.decode(datagram.data);
+              final map = jsonDecode(text) as Map<String, dynamic>;
+              if (map['serverName'] != null || map['ip'] != null) {
+                map['ip'] ??= datagram.address.address;
+                timer.cancel();
+                if (!completer.isCompleted) {
+                  completer.complete(map);
+                }
+              }
+            } catch (_) {}
+          }
+        }
+      });
+
+      final result = await completer.future;
+      socket.close();
+      return result;
+    } catch (_) {
+      socket?.close();
+      return null;
+    }
+  }
+
+  /// Auto-reconnect with persistent credentials.
+  /// Tries saved IP first; if DHCP changed the laptop IP, scans via UDP discovery,
+  /// re-binds the active IP seamlessly, and queries printers.
+  Future<ApiResult<List<PrinterInfo>>> autoReconnectAndGetPrinters(
+    ServerConnection savedConnection, {
+    Function(ServerConnection updated)? onIpUpdated,
+  }) async {
+    configure(savedConnection);
+
+    // 1. Try saved endpoint first
+    var printerRes = await getPrinters();
+    if (printerRes.success) {
+      return printerRes;
+    }
+
+    // 2. If saved endpoint is unreachable, auto-discover laptop over Wi-Fi
+    final discovered = await discoverServer();
+    if (discovered != null && discovered['ip'] != null) {
+      final newIp = discovered['ip'].toString();
+      final httpPort = discovered['httpPort'] as int? ?? savedConnection.httpPort;
+      final httpsPort =
+          discovered['httpsPort'] as int? ?? savedConnection.httpsPort;
+
+      final updatedConnection = savedConnection.copyWith(
+        ip: newIp,
+        httpPort: httpPort,
+        httpsPort: httpsPort,
+        isConnected: true,
+      );
+
+      configure(updatedConnection);
+      printerRes = await getPrinters();
+      if (printerRes.success) {
+        onIpUpdated?.call(updatedConnection);
+        return printerRes;
+      }
+    }
+
+    return printerRes;
+  }
 
   /// Test connection & discover server metadata
   Future<ApiResult<Map<String, dynamic>>> testAndDiscover({

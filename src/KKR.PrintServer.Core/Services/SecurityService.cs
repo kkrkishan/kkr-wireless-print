@@ -1,9 +1,11 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using KKR.PrintServer.Core.Logging;
+using KKR.PrintServer.Core.Common;
 using KKR.PrintServer.Core.Models;
+using System.Text.Json;
 
 namespace KKR.PrintServer.Core.Services;
 
@@ -16,6 +18,7 @@ public class SecurityService : ISecurityService
     private DateTime _previousPinExpiresAtUtc;
     private readonly int _pinExpiryMinutes;
     private readonly string _spoolTempDirectory;
+    private readonly string _clientsFilePath;
 
     private readonly ConcurrentDictionary<string, PairedClient> _clientsById = new();
     private readonly ConcurrentDictionary<string, string> _tokenHashToClientId = new();
@@ -66,6 +69,8 @@ public class SecurityService : ISecurityService
             Directory.CreateDirectory(_spoolTempDirectory);
         }
 
+        _clientsFilePath = Path.Combine(AppEnvironment.GetDataDirectory(), "paired_clients.json");
+        LoadPairedClients();
         GenerateNewPin();
     }
 
@@ -191,6 +196,61 @@ public class SecurityService : ISecurityService
             client.IsRevoked = true;
             _tokenHashToClientId.TryRemove(client.TokenHash, out _);
             AppLogger.Instance.Security("Auth", $"Client revoked: {client.DeviceName} ({clientId})");
+        }
+    }
+
+
+
+
+
+    private void LoadPairedClients()
+    {
+        try
+        {
+            if (File.Exists(_clientsFilePath))
+            {
+                string json = File.ReadAllText(_clientsFilePath, Encoding.UTF8);
+                var clients = JsonSerializer.Deserialize<List<PairedClient>>(json);
+                if (clients != null)
+                {
+                    foreach (var c in clients)
+                    {
+                        if (!c.IsRevoked)
+                        {
+                            _clientsById[c.ClientId] = c;
+                            if (!string.IsNullOrEmpty(c.TokenHash))
+                            {
+                                _tokenHashToClientId[c.TokenHash] = c.ClientId;
+                            }
+                        }
+                    }
+                    AppLogger.Instance.Info("Auth", $"Loaded {_clientsById.Count} previously paired client(s) from persistent storage.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Instance.Warning("Auth", $"Failed to load paired clients: {ex.Message}");
+        }
+    }
+
+    private void SavePairedClients()
+    {
+        try
+        {
+            string dir = Path.GetDirectoryName(_clientsFilePath) ?? string.Empty;
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            var list = _clientsById.Values.ToList();
+            string json = JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(_clientsFilePath, json, Encoding.UTF8);
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Instance.Warning("Auth", $"Failed to save paired clients: {ex.Message}");
         }
     }
 

@@ -12,7 +12,6 @@ import '../theme/app_theme.dart';
 import 'connect_screen.dart';
 import 'preview_and_settings_screen.dart';
 import '../widgets/desktop_companion_dialog.dart';
-import '../widgets/desktop_companion_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +20,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final ApiService _api = ApiService();
   final StorageService _storage = StorageService();
 
@@ -29,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<PrinterInfo> _printers = [];
   List<PrintJob> _recentJobs = [];
   bool _isLoading = false;
+  bool _isAutoConnecting = false;
   String? _statusMessage;
   Timer? _refreshTimer;
   StreamSubscription? _intentSub;
@@ -36,15 +36,32 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initApp();
     _listenToSharedFiles();
+
+    // Check if desktop companion promo should be shown on first run
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final dismissed = await _storage.loadDismissDesktopPromo();
+      if (!dismissed && _connection == null && mounted) {
+        DesktopCompanionDialog.show(context);
+      }
+    });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _refreshTimer?.cancel();
     _intentSub?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _autoReconnectSilently();
+    }
   }
 
   Future<void> _initApp() async {
@@ -54,20 +71,54 @@ class _HomeScreenState extends State<HomeScreen> {
     _recentJobs = await _storage.loadRecentJobs();
 
     if (_connection != null && _connection!.token != null) {
-      _api.configure(_connection!);
-      await _refreshPrinters();
-      await _syncRecentJobs();
+      final res = await _api.autoReconnectAndGetPrinters(
+        _connection!,
+        onIpUpdated: (updated) async {
+          await _storage.saveServerConnection(updated);
+          if (mounted) setState(() => _connection = updated);
+        },
+      );
+
+      if (res.success && res.data != null) {
+        _printers = res.data!;
+        _connection = _connection?.copyWith(isConnected: true);
+        _statusMessage = null;
+        await _syncRecentJobs(silent: true);
+      } else {
+        _statusMessage = res.errorMessage;
+        _connection = _connection?.copyWith(isConnected: false);
+      }
     }
 
     setState(() => _isLoading = false);
 
-    // Periodic auto-refresh every 15s if connected
+    // Periodic background auto-refresh & auto-reconnect every 15s
     _refreshTimer = Timer.periodic(const Duration(seconds: 15), (_) {
-      if (_connection != null && _api.isAuthenticated) {
-        _refreshPrinters(silent: true);
-        _syncRecentJobs(silent: true);
+      if (_connection != null && _connection!.token != null) {
+        _autoReconnectSilently();
       }
     });
+  }
+
+  Future<void> _autoReconnectSilently() async {
+    if (_connection == null || _connection!.token == null) return;
+
+    final res = await _api.autoReconnectAndGetPrinters(
+      _connection!,
+      onIpUpdated: (updated) async {
+        await _storage.saveServerConnection(updated);
+        if (mounted) setState(() => _connection = updated);
+      },
+    );
+
+    if (mounted && res.success && res.data != null) {
+      setState(() {
+        _printers = res.data!;
+        _connection = _connection?.copyWith(isConnected: true);
+        _statusMessage = null;
+      });
+      await _syncRecentJobs(silent: true);
+    }
   }
 
   void _listenToSharedFiles() {
@@ -92,19 +143,70 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) return;
 
     // Ensure connection & printers are loaded if coming from cold start
-    if (_connection == null || !_api.isAuthenticated) {
+    if (_connection == null || !_api.isAuthenticated || _printers.isEmpty) {
       await _storage.init();
       _connection = await _storage.loadServerConnection();
       if (_connection != null && _connection!.token != null) {
-        _api.configure(_connection!);
+        final res = await _api.autoReconnectAndGetPrinters(
+          _connection!,
+          onIpUpdated: (updated) async {
+            await _storage.saveServerConnection(updated);
+            if (mounted) setState(() => _connection = updated);
+          },
+        );
+        if (res.success && res.data != null) {
+          _printers = res.data!;
+          _connection = _connection?.copyWith(isConnected: true);
+        }
       }
     }
 
-    if (_api.isAuthenticated && _printers.isEmpty) {
-      await _refreshPrinters(silent: true);
+    await _openPrintFlow(file);
+  }
+
+  Future<void> _triggerManualAutoConnect() async {
+    setState(() {
+      _isAutoConnecting = true;
+      _statusMessage = 'Searching for Print Ofo PC on Wi-Fi...';
+    });
+
+    if (_connection != null && _connection!.token != null) {
+      final res = await _api.autoReconnectAndGetPrinters(
+        _connection!,
+        onIpUpdated: (updated) async {
+          await _storage.saveServerConnection(updated);
+          if (mounted) setState(() => _connection = updated);
+        },
+      );
+
+      if (mounted) {
+        setState(() => _isAutoConnecting = false);
+        if (res.success && res.data != null) {
+          setState(() {
+            _printers = res.data!;
+            _connection = _connection?.copyWith(isConnected: true);
+            _statusMessage = 'Connected automatically! Found ${_printers.length} printer(s).';
+          });
+          await _syncRecentJobs(silent: true);
+          return;
+        }
+      }
     }
 
-    await _openPrintFlow(file);
+    // Try zero-config UDP discovery
+    final discovered = await _api.discoverServer();
+    if (!mounted) return;
+
+    setState(() => _isAutoConnecting = false);
+
+    if (discovered != null && discovered['ip'] != null) {
+      final ip = discovered['ip'].toString();
+      _openConnectScreen(suggestedIp: ip);
+    } else {
+      setState(() {
+        _statusMessage = 'Could not find Print Ofo server on Wi-Fi. Ensure PC app is running.';
+      });
+    }
   }
 
   Future<void> _refreshPrinters({bool silent = false}) async {
@@ -135,7 +237,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final serverJobsRes = await _api.getJobs();
     if (serverJobsRes.success && serverJobsRes.data != null) {
       final serverJobs = serverJobsRes.data!;
-      // Merge with local recent jobs
       final local = await _storage.loadRecentJobs();
       final map = <String, PrintJob>{};
 
@@ -178,8 +279,17 @@ class _HomeScreenState extends State<HomeScreen> {
       await _storage.init();
       _connection = await _storage.loadServerConnection();
       if (_connection != null && _connection!.token != null) {
-        _api.configure(_connection!);
-        await _refreshPrinters(silent: true);
+        final res = await _api.autoReconnectAndGetPrinters(
+          _connection!,
+          onIpUpdated: (updated) async {
+            await _storage.saveServerConnection(updated);
+            if (mounted) setState(() => _connection = updated);
+          },
+        );
+        if (res.success && res.data != null) {
+          _printers = res.data!;
+          _connection = _connection?.copyWith(isConnected: true);
+        }
       }
     }
 
@@ -246,10 +356,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _openConnectScreen() async {
+  Future<void> _openConnectScreen({String? suggestedIp}) async {
+    var initConn = _connection;
+    if (suggestedIp != null) {
+      initConn = initConn?.copyWith(ip: suggestedIp) ??
+          ServerConnection(ip: suggestedIp, httpPort: 8080, httpsPort: 8443, pin: '');
+    }
+
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => ConnectScreen(initialConnection: _connection),
+        builder: (_) => ConnectScreen(initialConnection: initConn),
       ),
     );
 
@@ -297,7 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isConnected = _connection != null && _api.isAuthenticated;
+    final isConnected = _connection != null && _api.isAuthenticated && (_connection?.isConnected ?? false);
 
     return Scaffold(
       appBar: AppBar(
@@ -317,6 +433,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.laptop_windows, color: AppTheme.accentCyan),
+            tooltip: 'Get PC App (Microsoft Store)',
+            onPressed: () => DesktopCompanionDialog.show(context),
+          ),
           if (isConnected)
             IconButton(
               icon: const Icon(Icons.refresh),
@@ -329,15 +450,14 @@ class _HomeScreenState extends State<HomeScreen> {
               color: isConnected ? AppTheme.textMuted : AppTheme.accentCyan,
             ),
             tooltip: isConnected ? 'Disconnect' : 'Connect',
-            onPressed: isConnected ? _disconnectServer : _openConnectScreen,
+            onPressed: isConnected ? _disconnectServer : () => _openConnectScreen(),
           ),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          if (isConnected) {
-            await _refreshPrinters();
-            await _syncRecentJobs();
+          if (_connection != null) {
+            await _autoReconnectSilently();
           }
         },
         child: SingleChildScrollView(
@@ -346,6 +466,10 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (!isConnected) ...[
+                _buildDesktopCompanionBanner(),
+                const SizedBox(height: 12),
+              ],
               _buildServerStatusCard(isConnected),
               const SizedBox(height: 16),
               _buildPrintersSection(isConnected),
@@ -367,6 +491,61 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: 15,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopCompanionBanner() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF0284C7), width: 1.2),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0284C7).withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.laptop_chromebook, color: Color(0xFF38BDF8), size: 24),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Need Print Ofo on your PC?',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: Color(0xFF38BDF8),
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Install Windows companion app from Microsoft Store',
+                  style: TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0284C7),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+            ),
+            onPressed: () => DesktopCompanionDialog.show(context),
+            child: const Text('Get PC App'),
+          ),
+        ],
       ),
     );
   }
@@ -404,7 +583,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const Spacer(),
                 OutlinedButton(
-                  onPressed: _openConnectScreen,
+                  onPressed: () => _openConnectScreen(),
                   style: OutlinedButton.styleFrom(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -431,16 +610,48 @@ class _HomeScreenState extends State<HomeScreen> {
                 'LAN Endpoint: ${_connection!.ip}:${_connection!.httpPort} / ${_connection!.httpsPort} (Private Wi-Fi)',
                 style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
               ),
+              const SizedBox(height: 8),
+              Row(
+                children: const [
+                  Icon(Icons.autorenew, size: 14, color: AppTheme.successGreen),
+                  SizedBox(width: 6),
+                  Text(
+                    'Auto-reconnect active â€¢ Paired seamlessly',
+                    style: TextStyle(fontSize: 11, color: AppTheme.successGreen),
+                  ),
+                ],
+              ),
             ] else ...[
               const Text(
                 'Connect to your Windows laptop on the same Wi-Fi network to print to USB printers.',
                 style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
               ),
               const SizedBox(height: 12),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.qr_code_scanner),
-                label: const Text('Connect to Computer'),
-                onPressed: _openConnectScreen,
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: _isAutoConnecting
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Icon(Icons.wifi_find_outlined),
+                      label: Text(_isAutoConnecting ? 'Connecting...' : 'Auto-Connect (Wi-Fi)'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryBlue,
+                      ),
+                      onPressed: _isAutoConnecting ? null : _triggerManualAutoConnect,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.qr_code_scanner, size: 18),
+                    label: const Text('QR Scan'),
+                    onPressed: () => _openConnectScreen(),
+                  ),
+                ],
               ),
             ],
             if (_statusMessage != null) ...[
@@ -570,12 +781,12 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const SizedBox(height: 4),
             Text(
-              'Port: ${printer.port} • Status: ${printer.status}',
+              'Port: ${printer.port} â€¢ Status: ${printer.status}',
               style: const TextStyle(color: AppTheme.textMuted, fontSize: 12),
             ),
             const SizedBox(height: 4),
             Text(
-              '${printer.capabilities.supportsColor ? "Color" : "Monochrome"} • Max ${printer.capabilities.maxCopies} Copies',
+              '${printer.capabilities.supportsColor ? "Color" : "Monochrome"} â€¢ Max ${printer.capabilities.maxCopies} Copies',
               style: const TextStyle(fontSize: 11, color: AppTheme.accentCyan),
             ),
           ],
@@ -697,7 +908,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style:
                       const TextStyle(fontSize: 11, color: AppTheme.textMuted),
                 ),
-                const Text(' • ',
+                const Text(' â€¢ ',
                     style: TextStyle(color: AppTheme.textMuted, fontSize: 11)),
                 Text(
                   job.formattedFileSize,

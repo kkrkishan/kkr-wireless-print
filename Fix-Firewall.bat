@@ -32,10 +32,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
     "Write-Host '[1/3] Setting Wi-Fi network profile to Private...' -ForegroundColor Cyan; " ^
     "$wifiProfiles = Get-NetConnectionProfile | Where-Object { $_.InterfaceAlias -like '*Wi-Fi*' -or $_.InterfaceAlias -like '*WLAN*' }; " ^
     "foreach ($p in $wifiProfiles) { Set-NetConnectionProfile -Name $p.Name -NetworkCategory Private; Write-Host ('  Network ' + $p.Name + ' is now Private.') -ForegroundColor Green; }; " ^
-    "Write-Host '[2/3] Opening TCP ports 8080 and 8443 on all firewall profiles...' -ForegroundColor Cyan; " ^
+    "Write-Host '[2/3] Opening TCP 8080/8443 & UDP 8089 on all firewall profiles...' -ForegroundColor Cyan; " ^
     "Remove-NetFirewallRule -DisplayName 'Print Ofo*' -ErrorAction SilentlyContinue; " ^
     "Remove-NetFirewallRule -DisplayName 'KKR Wireless Print*' -ErrorAction SilentlyContinue; " ^
-    "New-NetFirewallRule -DisplayName 'Print Ofo Server (Ports 8080, 8443)' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8080,8443 -Profile Any -Enabled True | Out-Null; " ^
+    "New-NetFirewallRule -DisplayName 'Print Ofo Server (Ports 8080, 8443)' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8080,8443 -Profile Any -Enabled True | Out-Null; 
+    New-NetFirewallRule -DisplayName 'Print Ofo Discovery (UDP 8089)' -Direction Inbound -Action Allow -Protocol UDP -LocalPort 8089 -Profile Any -Enabled True | Out-Null; " ^
     "Write-Host '  Ports 8080 and 8443 are now open for all profiles.' -ForegroundColor Green; " ^
     "Write-Host '[3/3] Authorizing Print Ofo Server binary...' -ForegroundColor Cyan; " ^
     "if (Test-Path $appPath) { " ^

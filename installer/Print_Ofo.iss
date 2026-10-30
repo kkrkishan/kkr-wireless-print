@@ -1,8 +1,8 @@
-; Inno Setup 6 Script for Print Ofo
+﻿; Inno Setup 6 Script for Print Ofo
 ; Professional, self-contained Windows Installer for Microsoft Store & Direct Distribution
 
 #define MyAppName "Print Ofo"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "Print Ofo"
 #define MyAppURL "https://github.com/kkrkishan/kkr-wireless-print"
 #define MyAppExeName "PrintOfo.Server.exe"
@@ -64,6 +64,8 @@ Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""Print O
 ; Add Windows Firewall Port 8443 (HTTPS) Rule
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""Print Ofo Server (HTTPS 8443)"" dir=in action=allow protocol=TCP localport=8443 profile=any program=""{app}\{#MyAppExeName}"""; Flags: runhidden; StatusMsg: "Configuring Windows Firewall for HTTPS (port 8443)..."; Tasks: firewallrule
 
+; Add Windows Firewall Port 8089 (UDP Discovery) Rule
+Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""Print Ofo Server (UDP 8089)"" dir=in action=allow protocol=UDP localport=8089 profile=any program=""{app}\{#MyAppExeName}"""; Flags: runhidden; StatusMsg: "Configuring Windows Firewall for UDP Discovery (port 8089)..."; Tasks: firewallrule
 ; Add General Application Authorization Rule
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""Print Ofo Server Application"" dir=in action=allow program=""{app}\{#MyAppExeName}"" enable=yes profile=any"; Flags: runhidden; StatusMsg: "Authorizing Print Ofo Server application..."; Tasks: firewallrule
 
@@ -74,6 +76,7 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 ; Remove Windows Firewall Rules
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Print Ofo Server (HTTP 8080)"""; Flags: runhidden; RunOnceId: "DelFwHttp"
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Print Ofo Server (HTTPS 8443)"""; Flags: runhidden; RunOnceId: "DelFwHttps"
+Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Print Ofo Server (UDP 8089)"""; Flags: runhidden; RunOnceId: "DelFwUdp"
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Print Ofo Server Application"""; Flags: runhidden; RunOnceId: "DelFwApp"
 
 [Code]

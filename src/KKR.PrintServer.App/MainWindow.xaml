@@ -1,4 +1,4 @@
-﻿<Window x:Class="KKR.PrintServer.App.MainWindow"
+<Window x:Class="KKR.PrintServer.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,12 +8,12 @@
         mc:Ignorable="d"
         Title="Print Ofo - Windows Print Server"
         Icon="Assets/app.ico"
-        Height="880" Width="1280"
-        MinHeight="720" MinWidth="1024"
+        Height="640" Width="1060"
+        MinHeight="480" MinWidth="750"
         Background="{StaticResource BgDark}"
         WindowStartupLocation="CenterScreen">
 
-    <Grid Margin="20">
+    <Grid Margin="12,10,12,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />  <!-- Header -->
             <RowDefinition Height="Auto" />  <!-- Network & Alert Banner -->
@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
 
         <!-- HEADER -->
-        <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,16" Padding="18,12">
+        <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="14,10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -34,14 +34,14 @@
                         <TextBlock Text="OFO" FontWeight="Bold" FontSize="18" Foreground="#60A5FA" />
                     </Border>
                     <StackPanel>
-                        <TextBlock Text="PRINT OFO SERVER" FontSize="20" FontWeight="Bold" />
-                        <TextBlock Text="Local Wi-Fi Print Engine for Windows &amp; Android" FontSize="12" Foreground="{StaticResource SecondaryText}" />
+                        <TextBlock Text="PRINT OFO SERVER" FontSize="18" FontWeight="Bold" />
+                        <TextBlock Text="Local Wi-Fi Print Engine for Windows &amp; Android" FontSize="11" Foreground="{StaticResource SecondaryText}" />
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                     <!-- Status Badge -->
-                    <Border CornerRadius="14" Padding="14,6" Margin="0,0,14,0"
+                    <Border CornerRadius="14" Padding="12,5" Margin="0,0,12,0"
                             Background="{Binding IsServerRunning, Converter={x:Null}}">
                         <Border.Style>
                             <Style TargetType="Border">
@@ -54,7 +54,7 @@
                             </Style>
                         </Border.Style>
                         <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="10" Height="10" Margin="0,0,8,0">
+                            <Ellipse Width="8" Height="8" Margin="0,0,6,0">
                                 <Ellipse.Style>
                                     <Style TargetType="Ellipse">
                                         <Setter Property="Fill" Value="{StaticResource SuccessGreen}" />
@@ -66,17 +66,28 @@
                                     </Style>
                                 </Ellipse.Style>
                             </Ellipse>
-                            <TextBlock Text="{Binding ServerStatusText}" FontWeight="Bold" FontSize="12" Foreground="White" />
+                            <TextBlock Text="{Binding ServerStatusText}" FontWeight="Bold" FontSize="11" Foreground="White" />
                         </StackPanel>
                     </Border>
+
+                    <!-- Auto-Startup Checkbox -->
+                    <CheckBox Content="⚡ Start with Windows"
+                              IsChecked="{Binding IsAutoStartEnabled}"
+                              Foreground="#93C5FD"
+                              FontWeight="SemiBold"
+                              FontSize="11"
+                              VerticalAlignment="Center"
+                              Margin="0,0,12,0"
+                              ToolTip="Automatically start Print Ofo in background when your PC boots up" />
 
                     <!-- Get Android App Button -->
                     <Button Content="📱 Get Android App"
                             Command="{Binding ShowPlayStorePopupCommand}"
                             Style="{StaticResource ModernButton}"
                             Background="#0284C7"
-                            Margin="0,0,10,0"
-                            Padding="10,6"
+                            Margin="0,0,8,0"
+                            Padding="8,5"
+                            FontSize="11"
                             ToolTip="Show QR code &amp; link to download Print Ofo on Google Play Store" />
 
                     <!-- Toggle Server Button -->
@@ -85,6 +96,8 @@
                             <Style TargetType="Button" BasedOn="{StaticResource ModernButton}">
                                 <Setter Property="Content" Value="Stop Server" />
                                 <Setter Property="Background" Value="#DC2626" />
+                                <Setter Property="Padding" Value="10,5" />
+                                <Setter Property="FontSize" Value="11" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsServerRunning}" Value="False">
                                         <Setter Property="Content" Value="Start Server" />
@@ -99,434 +112,436 @@
         </Border>
 
         <!-- NETWORK & FIREWALL BANNER -->
-        <Border Grid.Row="1" Background="#1E293B" BorderBrush="#3B82F6" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,16">
+        <Border Grid.Row="1" Background="#1E293B" BorderBrush="#3B82F6" BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="ðŸ”’ Private Wi-Fi Endpoint:" FontWeight="SemiBold" Foreground="#93C5FD" Margin="0,0,8,0" />
-                    <TextBlock Text="{Binding ServerIp}" FontWeight="Bold" Foreground="White" Margin="0,0,4,0" />
-                    <TextBlock Text=" | HTTPS:" Foreground="{StaticResource SecondaryText}" Margin="0,0,4,0" />
-                    <TextBlock Text="{Binding HttpsPort}" FontWeight="SemiBold" Foreground="#34D399" Margin="0,0,12,0" />
-                    <TextBlock Text=" | HTTP Fallback:" Foreground="{StaticResource SecondaryText}" Margin="0,0,4,0" />
-                    <TextBlock Text="{Binding HttpPort}" FontWeight="SemiBold" Foreground="#FBBF24" Margin="0,0,16,0" />
-                    <TextBlock Text="(Only accessible over local Wi-Fi. No internet required)" FontSize="11" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                    <TextBlock Text="🔒 Private Wi-Fi Endpoint:" FontWeight="SemiBold" Foreground="#93C5FD" Margin="0,0,6,0" FontSize="11" />
+                    <TextBlock Text="{Binding ServerIp}" FontWeight="Bold" Foreground="White" Margin="0,0,4,0" FontSize="11" />
+                    <TextBlock Text=" | HTTPS:" Foreground="{StaticResource SecondaryText}" Margin="0,0,4,0" FontSize="11" />
+                    <TextBlock Text="{Binding HttpsPort}" FontWeight="SemiBold" Foreground="#34D399" Margin="0,0,8,0" FontSize="11" />
+                    <TextBlock Text=" | HTTP Fallback:" Foreground="{StaticResource SecondaryText}" Margin="0,0,4,0" FontSize="11" />
+                    <TextBlock Text="{Binding HttpPort}" FontWeight="SemiBold" Foreground="#FBBF24" Margin="0,0,12,0" FontSize="11" />
+                    <TextBlock Text="(Only accessible over local Wi-Fi. No internet required)" FontSize="10" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <TextBlock Text="TLS Thumbprint: " FontSize="11" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding HttpsThumbprint}" FontSize="11" FontFamily="Consolas" Foreground="#94A3B8" VerticalAlignment="Center" />
+                    <TextBlock Text="TLS Thumbprint: " FontSize="10" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding HttpsThumbprint}" FontSize="10" FontFamily="Consolas" Foreground="#94A3B8" VerticalAlignment="Center" />
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- MAIN TWO-COLUMN CONTENT AREA -->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="420" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <!-- MAIN TWO-COLUMN CONTENT AREA (WITH SCROLLER FOR SMALL SCREENS) -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="380" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <!-- LEFT COLUMN: Pairing & Printers -->
-            <Grid Grid.Column="0" Margin="0,0,16,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" /> <!-- Security & Pairing Card -->
-                    <RowDefinition Height="*" />    <!-- Printers List Card -->
-                </Grid.RowDefinitions>
+                <!-- LEFT COLUMN: Pairing & Printers -->
+                <Grid Grid.Column="0" Margin="0,0,12,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" /> <!-- Security & Pairing Card -->
+                        <RowDefinition Height="*" MinHeight="260" />    <!-- Printers List Card -->
+                    </Grid.RowDefinitions>
 
-                <!-- PAIRING CARD -->
-                <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,16">
-                    <StackPanel>
-                        <TextBlock Text="DEVICE PAIRING &amp; SECURITY" FontSize="13" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,10" />
+                    <!-- PAIRING CARD -->
+                    <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12" Padding="12">
+                        <StackPanel>
+                            <TextBlock Text="DEVICE PAIRING &amp; SECURITY" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,6" />
 
-                        <TextBlock Text="Enter this 6-digit PIN on the Print Ofo Android App to authorize connection:" FontSize="12" Foreground="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,0,0,12" />
+                            <TextBlock Text="Enter this 6-digit PIN on the Print Ofo Android App to pair (once paired, it reconnects automatically):" FontSize="11" Foreground="{StaticResource SecondaryText}" TextWrapping="Wrap" Margin="0,0,0,8" />
 
-                        <!-- QR CODE & PIN SECTION -->
-                        <Grid Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                            <!-- QR CODE & PIN SECTION -->
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                            <!-- QR CODE BOX -->
-                            <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="6" Width="110" Height="110" Margin="0,0,12,0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Image Source="{Binding QrCodeImage}" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                                <!-- QR CODE BOX -->
+                                <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="4" Width="96" Height="96" Margin="0,0,10,0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Image Source="{Binding QrCodeImage}" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                                </Border>
+
+                                <!-- PIN AND ACTIONS -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="PAIRING PIN" FontSize="9" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,2" />
+                                    <Border Background="#0F172A" BorderBrush="#2563EB" BorderThickness="2" CornerRadius="6" Padding="8,4" Margin="0,0,0,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding CurrentPin}" FontSize="22" FontWeight="Bold" FontFamily="Consolas" Foreground="#60A5FA" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            <Button Grid.Column="1" Content="📋" Command="{Binding CopyPinCommand}" Style="{StaticResource ModernButton}" Background="#334155" Margin="4,0,0,0" Padding="4,2" FontSize="10" ToolTip="Copy PIN" />
+                                        </Grid>
+                                    </Border>
+                                    <TextBlock Text="{Binding PinExpiryText}" FontSize="9" Foreground="{StaticResource WarningAmber}" Margin="0,0,0,4" />
+                                    <Button Content="🔄 Regenerate PIN" Command="{Binding RegeneratePinCommand}" Style="{StaticResource ModernButton}" Background="#0284C7" Padding="6,3" FontSize="9" HorizontalAlignment="Left" />
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="📷 Scan QR with Print Ofo app, or enter PIN manually." FontSize="10" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,0,0,8" />
+
+                            <!-- Play Store Promo Card -->
+                            <Border Background="#1E293B" BorderBrush="#0284C7" BorderThickness="1" CornerRadius="6" Padding="8,6" Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="📱 Need Print Ofo on Android?" FontWeight="Bold" FontSize="10" Foreground="#38BDF8" />
+                                        <TextBlock Text="Download free from Google Play Store" FontSize="9" Foreground="{StaticResource SecondaryText}" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="Get QR" Command="{Binding ShowPlayStorePopupCommand}" Style="{StaticResource ModernButton}" Background="#0284C7" FontSize="9" Padding="6,3" />
+                                </Grid>
                             </Border>
 
-                            <!-- PIN AND ACTIONS -->
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="PAIRING PIN" FontSize="10" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,4" />
-                                <Border Background="#0F172A" BorderBrush="#2563EB" BorderThickness="2" CornerRadius="8" Padding="10,6" Margin="0,0,0,6">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding CurrentPin}" FontSize="26" FontWeight="Bold" FontFamily="Consolas" Foreground="#60A5FA" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        <Button Grid.Column="1" Content="ðŸ“‹" Command="{Binding CopyPinCommand}" Style="{StaticResource ModernButton}" Background="#334155" Margin="6,0,0,0" Padding="6,2" FontSize="11" ToolTip="Copy PIN" />
-                                    </Grid>
-                                </Border>
-                                <TextBlock Text="{Binding PinExpiryText}" FontSize="10" Foreground="{StaticResource WarningAmber}" Margin="0,0,0,6" />
-                                <Button Content="ðŸ”„ Regenerate PIN" Command="{Binding RegeneratePinCommand}" Style="{StaticResource ModernButton}" Background="#0284C7" Padding="8,4" FontSize="10" HorizontalAlignment="Left" />
-                            </StackPanel>
-                        </Grid>
+                            <Grid Margin="0,2,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Content="Export TLS Cert" Command="{Binding OpenCertFolderCommand}" Style="{StaticResource ModernButton}" Background="#0284C7" Margin="0,0,4,0" FontSize="10" Padding="6,3" ToolTip="Opens the folder containing kkr-print-server.cer / .pem for Android SSL trust" />
+                                <Button Grid.Column="1" Content="View Log Files" Command="{Binding OpenLogsFolderCommand}" Style="{StaticResource ModernButton}" Background="#475569" Margin="4,0,0,0" FontSize="10" Padding="6,3" ToolTip="Opens local audit log folder" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
 
-                        <TextBlock Text="ðŸ“· Scan QR code with Print Ofo Android app, or enter PIN manually." FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                    <!-- PRINTERS CARD -->
+                    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Padding="12">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                        <!-- Play Store Promo Card -->
-                        <Border Background="#1E293B" BorderBrush="#0284C7" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,10">
-                            <Grid>
+                            <Grid Grid.Row="0" Margin="0,0,0,8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="📱 Need Print Ofo on Android?" FontWeight="Bold" FontSize="11" Foreground="#38BDF8" />
-                                    <TextBlock Text="Download free from Google Play Store" FontSize="10" Foreground="{StaticResource SecondaryText}" />
-                                </StackPanel>
-                                <Button Grid.Column="1" Content="Get App QR" Command="{Binding ShowPlayStorePopupCommand}" Style="{StaticResource ModernButton}" Background="#0284C7" FontSize="10" Padding="8,4" />
+                                <TextBlock Text="INSTALLED PRINTERS" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Content="🔄 Refresh" Command="{Binding RefreshPrintersCommand}" Style="{StaticResource ModernButton}" Background="#334155" Padding="6,3" FontSize="10" />
                             </Grid>
-                        </Border>
 
-                        <Grid Margin="0,4,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="Export TLS Cert" Command="{Binding OpenCertFolderCommand}" Style="{StaticResource ModernButton}" Background="#0284C7" Margin="0,0,4,0" FontSize="11" ToolTip="Opens the folder containing kkr-print-server.cer / .pem for Android SSL trust" />
-                            <Button Grid.Column="1" Content="View Log Files" Command="{Binding OpenLogsFolderCommand}" Style="{StaticResource ModernButton}" Background="#475569" Margin="4,0,0,0" FontSize="11" ToolTip="Opens local audit log folder" />
-                        </Grid>
-                    </StackPanel>
-                </Border>
+                            <!-- Printers ListView -->
+                            <ListView Grid.Row="1" ItemsSource="{Binding Printers}" SelectedItem="{Binding SelectedPrinter}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" MaxHeight="220">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="Margin" Value="0,0,0,6" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListViewItem">
+                                                    <Border x:Name="itemBorder" Background="#0F172A" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="10">
+                                                        <ContentPresenter />
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter TargetName="itemBorder" Property="BorderBrush" Value="#3B82F6" />
+                                                            <Setter TargetName="itemBorder" Property="Background" Value="#1E293B" />
+                                                        </Trigger>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="itemBorder" Property="BorderBrush" Value="#64748B" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
 
-                <!-- PRINTERS CARD -->
-                <Border Grid.Row="1" Style="{StaticResource CardStyle}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <Grid Grid.Row="0" Margin="0,0,0,12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="INSTALLED PRINTERS" FontSize="13" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
-                            <Button Grid.Column="1" Content="ðŸ”„ Refresh" Command="{Binding RefreshPrintersCommand}" Style="{StaticResource ModernButton}" Background="#334155" Padding="8,4" FontSize="11" />
-                        </Grid>
-
-                        <!-- Printers ListView -->
-                        <ListView Grid.Row="1" ItemsSource="{Binding Printers}" SelectedItem="{Binding SelectedPrinter}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="ListViewItem">
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                    <Setter Property="Padding" Value="0" />
-                                    <Setter Property="Margin" Value="0,0,0,8" />
-                                    <Setter Property="Background" Value="Transparent" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="ListViewItem">
-                                                <Border x:Name="itemBorder" Background="#0F172A" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="12">
-                                                    <ContentPresenter />
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsSelected" Value="True">
-                                                        <Setter TargetName="itemBorder" Property="BorderBrush" Value="#3B82F6" />
-                                                        <Setter TargetName="itemBorder" Property="Background" Value="#1E293B" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="itemBorder" Property="BorderBrush" Value="#64748B" />
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </ListView.ItemContainerStyle>
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-
-                                        <!-- Printer Title & Default Badge -->
-                                        <Grid Grid.Row="0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" Foreground="White" TextTrimming="CharacterEllipsis" />
-                                            <Border Grid.Column="1" Background="#059669" CornerRadius="4" Padding="6,2" Visibility="{Binding IsDefault, Converter={x:Null}}">
-                                                <Border.Style>
-                                                    <Style TargetType="Border">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsDefault}" Value="True">
-                                                                <Setter Property="Visibility" Value="Visible" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Border.Style>
-                                                <TextBlock Text="DEFAULT" FontSize="9" FontWeight="Bold" Foreground="White" />
-                                            </Border>
-                                        </Grid>
-
-                                        <!-- Driver & Port Details -->
-                                        <StackPanel Grid.Row="1" Margin="0,4,0,8">
-                                            <TextBlock Text="{Binding DriverName}" FontSize="11" Foreground="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" />
-                                            <TextBlock Text="{Binding PortName}" FontSize="10" Foreground="#64748B" />
-                                        </StackPanel>
-
-                                        <!-- Status Badges & Test Print Button -->
-                                        <Grid Grid.Row="2">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-
-                                            <WrapPanel VerticalAlignment="Center">
-                                                <!-- Online / Offline Badge -->
-                                                <Border CornerRadius="4" Padding="6,2" Margin="0,0,4,0">
-                                                    <Border.Style>
-                                                        <Style TargetType="Border">
-                                                            <Setter Property="Background" Value="#065F46" />
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsOnline}" Value="False">
-                                                                    <Setter Property="Background" Value="#7F1D1D" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>
-                                                    <TextBlock Text="{Binding StatusDescription}" FontSize="10" FontWeight="SemiBold" Foreground="White" />
-                                                </Border>
-
-                                                <!-- Color Badge -->
-                                                <Border Background="#0284C7" CornerRadius="4" Padding="6,2" Margin="0,0,4,0" Visibility="{Binding SupportsColor, Converter={x:Null}}">
+                                            <!-- Printer Title & Default Badge -->
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="13" Foreground="White" TextTrimming="CharacterEllipsis" />
+                                                <Border Grid.Column="1" Background="#059669" CornerRadius="4" Padding="4,2" Visibility="{Binding IsDefault, Converter={x:Null}}">
                                                     <Border.Style>
                                                         <Style TargetType="Border">
                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding SupportsColor}" Value="True">
+                                                                <DataTrigger Binding="{Binding IsDefault}" Value="True">
                                                                     <Setter Property="Visibility" Value="Visible" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Border.Style>
-                                                    <TextBlock Text="Color" FontSize="10" Foreground="#93C5FD" />
+                                                    <TextBlock Text="DEFAULT" FontSize="8" FontWeight="Bold" Foreground="White" />
                                                 </Border>
+                                            </Grid>
 
-                                                <!-- Duplex Badge -->
-                                                <Border Background="#312E81" CornerRadius="4" Padding="6,2" Visibility="{Binding CanDuplex, Converter={x:Null}}">
+                                            <!-- Driver & Port Details -->
+                                            <StackPanel Grid.Row="1" Margin="0,2,0,6">
+                                                <TextBlock Text="{Binding DriverName}" FontSize="10" Foreground="{StaticResource SecondaryText}" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding PortName}" FontSize="9" Foreground="#64748B" />
+                                            </StackPanel>
+
+                                            <!-- Status Badges & Test Print Button -->
+                                            <Grid Grid.Row="2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <WrapPanel VerticalAlignment="Center">
+                                                    <!-- Online / Offline Badge -->
+                                                    <Border CornerRadius="4" Padding="4,2" Margin="0,0,4,0">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Background" Value="#065F46" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsOnline}" Value="False">
+                                                                        <Setter Property="Background" Value="#7F1D1D" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <TextBlock Text="{Binding StatusDescription}" FontSize="9" FontWeight="SemiBold" Foreground="White" />
+                                                    </Border>
+
+                                                    <!-- Color Badge -->
+                                                    <Border Background="#0284C7" CornerRadius="4" Padding="4,2" Margin="0,0,4,0" Visibility="{Binding SupportsColor, Converter={x:Null}}">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding SupportsColor}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <TextBlock Text="Color" FontSize="9" Foreground="#93C5FD" />
+                                                    </Border>
+
+                                                    <!-- Duplex Badge -->
+                                                    <Border Background="#312E81" CornerRadius="4" Padding="4,2" Visibility="{Binding CanDuplex, Converter={x:Null}}">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding CanDuplex}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <TextBlock Text="Duplex" FontSize="9" Foreground="#C7D2FE" />
+                                                    </Border>
+                                                </WrapPanel>
+
+                                                <!-- Print Test Page Button -->
+                                                <Button Grid.Column="1" Content="Test Page" Command="{Binding PrintTestPageCommand}" Style="{StaticResource ModernButton}" Background="#2563EB" FontSize="10" Padding="6,3" />
+                                            </Grid>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+
+                            <!-- Hardware Testing Action -->
+                            <Border Grid.Row="2" Background="#0F172A" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,8,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Physical USB Hardware Testing" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,4" />
+                                    <Button Content="📄 Test Print Local File to Selected Printer" Command="{Binding SubmitLocalFileCommand}" Style="{StaticResource ModernButton}" Background="#059669" FontSize="11" Padding="8,4" HorizontalAlignment="Stretch" ToolTip="Pick a local PDF, PNG, or JPG file to verify print processing on the selected printer" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- RIGHT COLUMN: Print Queue & Activity Logs -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" MinHeight="220" />     <!-- Print Queue & Jobs DataGrid -->
+                        <RowDefinition Height="200" />   <!-- Activity & Audit Logs -->
+                    </Grid.RowDefinitions>
+
+                    <!-- PRINT JOBS QUEUE -->
+                    <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,12" Padding="12">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="LIVE PRINT QUEUE &amp; JOB AUDIT" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding Jobs.Count, StringFormat='Total Jobs: {0}'}" FontSize="11" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                            </Grid>
+
+                            <DataGrid Grid.Row="1" ItemsSource="{Binding Jobs}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#334155" RowBackground="#0F172A" AlternatingRowBackground="#1E293B" Foreground="White" FontSize="11">
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#1E293B" />
+                                        <Setter Property="Foreground" Value="{StaticResource SecondaryText}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                        <Setter Property="Padding" Value="6,4" />
+                                        <Setter Property="BorderThickness" Value="0" />
+                                    </Style>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Time" Binding="{Binding CreatedAtLocal}" Width="70" />
+                                    <DataGridTextColumn Header="Document" Binding="{Binding DocumentName}" Width="140" />
+                                    <DataGridTextColumn Header="Printer" Binding="{Binding PrinterName}" Width="130" />
+                                    <DataGridTextColumn Header="Device" Binding="{Binding ClientDeviceName}" Width="100" />
+                                    <DataGridTextColumn Header="Pages" Binding="{Binding PageCount}" Width="50" />
+                                    <DataGridTextColumn Header="Size" Binding="{Binding FileSizeFormatted}" Width="70" />
+
+                                    <!-- Status Column with Custom Badge -->
+                                    <DataGridTemplateColumn Header="Status" Width="110">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border CornerRadius="4" Padding="5,2" HorizontalAlignment="Left">
                                                     <Border.Style>
                                                         <Style TargetType="Border">
-                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Setter Property="Background" Value="#1E293B" />
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding CanDuplex}" Value="True">
-                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                <DataTrigger Binding="{Binding Status}" Value="Accepted">
+                                                                    <Setter Property="Background" Value="#1E3A8A" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Queued">
+                                                                    <Setter Property="Background" Value="#374151" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Processing">
+                                                                    <Setter Property="Background" Value="#D97706" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                                                    <Setter Property="Background" Value="#059669" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                                                    <Setter Property="Background" Value="#DC2626" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Cancelled">
+                                                                    <Setter Property="Background" Value="#4B5563" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Border.Style>
-                                                    <TextBlock Text="Duplex" FontSize="10" Foreground="#C7D2FE" />
+                                                    <TextBlock Text="{Binding StatusDescription}" FontWeight="SemiBold" FontSize="10" Foreground="White" />
                                                 </Border>
-                                            </WrapPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
 
-                                            <!-- Print Test Page Button -->
-                                            <Button Grid.Column="1" Content="Print Test Page" Command="{Binding PrintTestPageCommand}" Style="{StaticResource ModernButton}" Background="#2563EB" FontSize="11" Padding="8,4" />
+                                    <!-- Action / Cancel Column -->
+                                    <DataGridTemplateColumn Header="Action" Width="70">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="Cancel" Command="{Binding CancelCommand}" Background="#DC2626" FontSize="10" Padding="5,2">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button" BasedOn="{StaticResource ModernButton}">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding CanCancel}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+
+                    <!-- ACTIVITY & AUDIT LOGS -->
+                    <Border Grid.Row="1" Style="{StaticResource CardStyle}" Padding="12">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="LIVE SECURITY AUDIT &amp; ACTIVITY LOG" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Button Content="Clear" Command="{Binding ClearLogsCommand}" Style="{StaticResource ModernButton}" Background="#334155" Padding="6,2" FontSize="10" Margin="0,0,6,0" />
+                                    <Button Content="Open Logs" Command="{Binding OpenLogsFolderCommand}" Style="{StaticResource ModernButton}" Background="#334155" Padding="6,2" FontSize="10" />
+                                </StackPanel>
+                            </Grid>
+
+                            <ListView Grid.Row="1" ItemsSource="{Binding Logs}" Background="#0F172A" BorderBrush="#334155" BorderThickness="1" Foreground="#CBD5E1" FontFamily="Consolas" FontSize="10">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="120" />
+                                                <ColumnDefinition Width="55" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding TimestampLocal, StringFormat='HH:mm:ss'}" Foreground="#64748B" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Level}" FontWeight="Bold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#60A5FA" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Level}" Value="Warning">
+                                                                <Setter Property="Foreground" Value="{StaticResource WarningAmber}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Level}" Value="Error">
+                                                                <Setter Property="Foreground" Value="{StaticResource DangerRed}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Level}" Value="Security">
+                                                                <Setter Property="Foreground" Value="#A855F7" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <TextBlock Grid.Column="2" Text="{Binding Category}" Foreground="#94A3B8" />
+                                            <TextBlock Grid.Column="3" Text="{Binding Message}" Foreground="#F8FAFC" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
                                         </Grid>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-
-                        <!-- Hardware Testing Action -->
-                        <Border Grid.Row="2" Background="#0F172A" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,10,0,0">
-                            <StackPanel>
-                                <TextBlock Text="Physical USB Hardware Testing" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,6" />
-                                <Button Content="ðŸ“„ Test Print Local File to Selected Printer" Command="{Binding SubmitLocalFileCommand}" Style="{StaticResource ModernButton}" Background="#059669" FontSize="12" HorizontalAlignment="Stretch" ToolTip="Pick a local PDF, PNG, or JPG file to verify print processing on the selected printer" />
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </Border>
-            </Grid>
-
-            <!-- RIGHT COLUMN: Print Queue & Activity Logs -->
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />     <!-- Print Queue & Jobs DataGrid -->
-                    <RowDefinition Height="260" />   <!-- Activity & Audit Logs -->
-                </Grid.RowDefinitions>
-
-                <!-- PRINT JOBS QUEUE -->
-                <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="0,0,0,16">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <Grid Grid.Row="0" Margin="0,0,0,12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="LIVE PRINT QUEUE &amp; JOB AUDIT" FontSize="13" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="{Binding Jobs.Count, StringFormat='Total Jobs: {0}'}" FontSize="12" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
                         </Grid>
-
-                        <DataGrid Grid.Row="1" ItemsSource="{Binding Jobs}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Background="Transparent" BorderThickness="0" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#334155" RowBackground="#0F172A" AlternatingRowBackground="#1E293B" Foreground="White">
-                            <DataGrid.ColumnHeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background" Value="#1E293B" />
-                                    <Setter Property="Foreground" Value="{StaticResource SecondaryText}" />
-                                    <Setter Property="FontWeight" Value="SemiBold" />
-                                    <Setter Property="Padding" Value="8,6" />
-                                    <Setter Property="BorderThickness" Value="0" />
-                                </Style>
-                            </DataGrid.ColumnHeaderStyle>
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Time" Binding="{Binding CreatedAtLocal}" Width="75" />
-                                <DataGridTextColumn Header="Document" Binding="{Binding DocumentName}" Width="160" />
-                                <DataGridTextColumn Header="Target Printer" Binding="{Binding PrinterName}" Width="150" />
-                                <DataGridTextColumn Header="Device / IP" Binding="{Binding ClientDeviceName}" Width="120" />
-                                <DataGridTextColumn Header="Pages" Binding="{Binding PageCount}" Width="55" />
-                                <DataGridTextColumn Header="Size" Binding="{Binding FileSizeFormatted}" Width="75" />
-
-                                <!-- Status Column with Custom Badge -->
-                                <DataGridTemplateColumn Header="Spooler Status" Width="130">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Left">
-                                                <Border.Style>
-                                                    <Style TargetType="Border">
-                                                        <Setter Property="Background" Value="#1E293B" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Status}" Value="Accepted">
-                                                                <Setter Property="Background" Value="#1E3A8A" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Status}" Value="Queued">
-                                                                <Setter Property="Background" Value="#374151" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Status}" Value="Processing">
-                                                                <Setter Property="Background" Value="#D97706" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Status}" Value="Completed">
-                                                                <Setter Property="Background" Value="#059669" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Status}" Value="Failed">
-                                                                <Setter Property="Background" Value="#DC2626" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Status}" Value="Cancelled">
-                                                                <Setter Property="Background" Value="#4B5563" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Border.Style>
-                                                <TextBlock Text="{Binding StatusDescription}" FontWeight="SemiBold" FontSize="11" Foreground="White" />
-                                            </Border>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-
-                                <!-- Action / Cancel Column -->
-                                <DataGridTemplateColumn Header="Action" Width="80">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button Content="Cancel" Command="{Binding CancelCommand}" Background="#DC2626" FontSize="10" Padding="6,2">
-                                                <Button.Style>
-                                                    <Style TargetType="Button" BasedOn="{StaticResource ModernButton}">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding CanCancel}" Value="True">
-                                                                <Setter Property="Visibility" Value="Visible" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Button.Style>
-                                            </Button>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
-                </Border>
-
-                <!-- ACTIVITY & AUDIT LOGS -->
-                <Border Grid.Row="1" Style="{StaticResource CardStyle}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <Grid Grid.Row="0" Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="LIVE SECURITY AUDIT &amp; ACTIVITY LOG" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
-                            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                <Button Content="Clear" Command="{Binding ClearLogsCommand}" Style="{StaticResource ModernButton}" Background="#334155" Padding="8,2" FontSize="11" Margin="0,0,6,0" />
-                                <Button Content="Open Logs" Command="{Binding OpenLogsFolderCommand}" Style="{StaticResource ModernButton}" Background="#334155" Padding="8,2" FontSize="11" />
-                            </StackPanel>
-                        </Grid>
-
-                        <ListView Grid.Row="1" ItemsSource="{Binding Logs}" Background="#0F172A" BorderBrush="#334155" BorderThickness="1" Foreground="#CBD5E1" FontFamily="Consolas" FontSize="11">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="0,1">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="135" />
-                                            <ColumnDefinition Width="65" />
-                                            <ColumnDefinition Width="100" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding TimestampLocal, StringFormat='yyyy-MM-dd HH:mm:ss'}" Foreground="#64748B" />
-                                        <TextBlock Grid.Column="1" Text="{Binding Level}" FontWeight="Bold">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Foreground" Value="#60A5FA" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Level}" Value="Warning">
-                                                            <Setter Property="Foreground" Value="{StaticResource WarningAmber}" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Level}" Value="Error">
-                                                            <Setter Property="Foreground" Value="{StaticResource DangerRed}" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Level}" Value="Security">
-                                                            <Setter Property="Foreground" Value="#A855F7" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                        <TextBlock Grid.Column="2" Text="{Binding Category}" Foreground="#94A3B8" />
-                                        <TextBlock Grid.Column="3" Text="{Binding Message}" Foreground="#F8FAFC" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </Grid>
-                </Border>
+                    </Border>
+                </Grid>
             </Grid>
-        </Grid>
+        </ScrollViewer>
 
         <!-- STATUS BAR FOOTER -->
-        <Border Grid.Row="3" Margin="0,12,0,0" Padding="4,0">
+        <Border Grid.Row="3" Margin="0,8,0,0" Padding="4,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="{StaticResource SecondaryText}" />
-                <TextBlock Grid.Column="1" Text="Print Ofo v1.0.0 - Production Edition" FontSize="11" Foreground="#475569" />
+                <TextBlock Text="{Binding StatusMessage}" FontSize="11" Foreground="{StaticResource SecondaryText}" />
+                <TextBlock Grid.Column="1" Text="Print Ofo v1.1.0 - Production Edition" FontSize="10" Foreground="#475569" />
             </Grid>
         </Border>
 
@@ -536,39 +551,39 @@
               Background="#D0020617"
               Panel.ZIndex="1000">
             <Border HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Width="540" MaxWidth="580"
+                    Width="500" MaxWidth="540"
                     Background="#0F172A" BorderBrush="#0284C7" BorderThickness="2"
-                    CornerRadius="14" Padding="24">
+                    CornerRadius="14" Padding="20">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="30" ShadowDepth="0" Color="#0284C7" Opacity="0.4" />
                 </Border.Effect>
                 <StackPanel>
                     <!-- Header -->
-                    <Grid Margin="0,0,0,16">
+                    <Grid Margin="0,0,0,12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Background="#0284C7" CornerRadius="6" Padding="8,4" Margin="0,0,12,0">
-                                <TextBlock Text="📱" FontSize="18" />
+                            <Border Background="#0284C7" CornerRadius="6" Padding="6,3" Margin="0,0,10,0">
+                                <TextBlock Text="📱" FontSize="16" />
                             </Border>
                             <StackPanel>
-                                <TextBlock Text="Download Print Ofo for Android" FontSize="16" FontWeight="Bold" Foreground="White" />
-                                <TextBlock Text="Available on Google Play Store" FontSize="12" Foreground="#38BDF8" />
+                                <TextBlock Text="Download Print Ofo for Android" FontSize="15" FontWeight="Bold" Foreground="White" />
+                                <TextBlock Text="Available on Google Play Store" FontSize="11" Foreground="#38BDF8" />
                             </StackPanel>
                         </StackPanel>
                         <Button Grid.Column="1" Content="✕" Command="{Binding ClosePlayStorePopupCommand}"
-                                Background="Transparent" Foreground="#94A3B8" FontWeight="Bold" FontSize="14"
-                                BorderThickness="0" Cursor="Hand" Padding="8,4" />
+                                Background="Transparent" Foreground="#94A3B8" FontWeight="Bold" FontSize="13"
+                                BorderThickness="0" Cursor="Hand" Padding="6,2" />
                     </Grid>
 
                     <!-- Explanatory Text -->
                     <TextBlock Text="To print photos, PDFs, and documents wirelessly from your phone to the USB printers connected to this computer, install the companion app on your Android device."
-                               TextWrapping="Wrap" FontSize="12" Foreground="#CBD5E1" LineHeight="18" Margin="0,0,0,16" />
+                               TextWrapping="Wrap" FontSize="11" Foreground="#CBD5E1" LineHeight="16" Margin="0,0,0,12" />
 
                     <!-- QR Code & Instructions Box -->
-                    <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                    <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,12">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -576,21 +591,21 @@
                             </Grid.ColumnDefinitions>
 
                             <!-- QR Code Box -->
-                            <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="6" Width="130" Height="130" Margin="0,0,16,0" VerticalAlignment="Center">
+                            <Border Grid.Column="0" Background="White" CornerRadius="8" Padding="6" Width="110" Height="110" Margin="0,0,14,0" VerticalAlignment="Center">
                                 <Image Source="{Binding PlayStoreQrCodeImage}" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" />
                             </Border>
 
                             <!-- Instructions & Direct Buttons -->
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="SCAN WITH PHONE CAMERA" FontSize="11" FontWeight="Bold" Foreground="#38BDF8" Margin="0,0,0,6" />
+                                <TextBlock Text="SCAN WITH PHONE CAMERA" FontSize="10" FontWeight="Bold" Foreground="#38BDF8" Margin="0,0,0,4" />
                                 <TextBlock Text="1. Open camera on your Android phone&#x0a;2. Point at this QR code to open Play Store&#x0a;3. Tap 'Install' and pair over local Wi-Fi"
-                                           FontSize="11" Foreground="#94A3B8" LineHeight="16" Margin="0,0,0,12" />
+                                           FontSize="10" Foreground="#94A3B8" LineHeight="15" Margin="0,0,0,10" />
 
                                 <StackPanel Orientation="Horizontal">
                                     <Button Content="Open in Browser" Command="{Binding OpenPlayStoreLinkCommand}"
-                                            Style="{StaticResource ModernButton}" Background="#0284C7" Padding="10,6" FontSize="11" Margin="0,0,8,0" />
+                                            Style="{StaticResource ModernButton}" Background="#0284C7" Padding="8,4" FontSize="10" Margin="0,0,6,0" />
                                     <Button Content="📋 Copy Link" Command="{Binding CopyPlayStoreLinkCommand}"
-                                            Style="{StaticResource ModernButton}" Background="#334155" Padding="10,6" FontSize="11" />
+                                            Style="{StaticResource ModernButton}" Background="#334155" Padding="8,4" FontSize="10" />
                                 </StackPanel>
                             </StackPanel>
                         </Grid>
@@ -604,13 +619,12 @@
                         </Grid.ColumnDefinitions>
                         <CheckBox Content="Don't show this popup on startup"
                                   IsChecked="{Binding DontShowPlayStorePopupAgain}"
-                                  Foreground="#94A3B8" FontSize="11" VerticalAlignment="Center" />
+                                  Foreground="#94A3B8" FontSize="10" VerticalAlignment="Center" />
                         <Button Grid.Column="1" Content="Got it, Continue" Command="{Binding ClosePlayStorePopupCommand}"
-                                Style="{StaticResource ModernButton}" Background="#10B981" Padding="16,6" FontSize="12" />
+                                Style="{StaticResource ModernButton}" Background="#10B981" Padding="14,5" FontSize="11" />
                     </Grid>
                 </StackPanel>
             </Border>
         </Grid>
     </Grid>
 </Window>
-

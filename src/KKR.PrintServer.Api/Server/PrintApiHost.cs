@@ -23,6 +23,7 @@ public class PrintApiHost
 
     private WebApplication? _app;
     private CancellationTokenSource? _hostCts;
+    private UdpDiscoveryService? _udpDiscovery;
 
     public bool IsRunning => _app != null;
     public string? HttpUrl { get; private set; }
@@ -114,11 +115,27 @@ public class PrintApiHost
         HttpUrl = _config.EnableHttpFallback ? $"http://{GetDisplayIp()}:{_config.HttpPort}" : null;
         HttpsUrl = _config.EnableHttps ? $"https://{GetDisplayIp()}:{_config.HttpsPort}" : null;
 
+        try
+        {
+            _udpDiscovery = new UdpDiscoveryService(_config);
+            _udpDiscovery.Start(GetDisplayIp());
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Instance.Warning("Discovery", $"UDP Auto-Discovery could not be started: {ex.Message}");
+        }
+
         AppLogger.Instance.Info("Host", $"Print Server API started. HTTP: {HttpUrl ?? "Disabled"}, HTTPS: {HttpsUrl ?? "Disabled"}");
     }
 
     public async Task StopAsync()
     {
+        if (_udpDiscovery != null)
+        {
+            _udpDiscovery.Dispose();
+            _udpDiscovery = null;
+        }
+
         if (_app != null)
         {
             await _app.StopAsync();

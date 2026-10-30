@@ -6,7 +6,6 @@ import '../../services/api_service.dart';
 import '../../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/desktop_companion_dialog.dart';
-import '../widgets/desktop_companion_dialog.dart';
 
 class ConnectScreen extends StatefulWidget {
   final ServerConnection? initialConnection;
@@ -49,7 +48,7 @@ class _ConnectScreenState extends State<ConnectScreen>
           widget.initialConnection!.httpsPort.toString();
       _pinController.text = widget.initialConnection!.pin;
     } else {
-      _ipController.text = '10.92.81.221';
+      _ipController.text = '192.168.1.100';
     }
   }
 
@@ -126,6 +125,39 @@ class _ConnectScreenState extends State<ConnectScreen>
     }
   }
 
+  Future<void> _handleAutoDiscover() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _statusText = 'Scanning local Wi-Fi for Print Ofo PC...';
+    });
+
+    final discovered = await ApiService().discoverServer();
+    if (!mounted) return;
+
+    if (discovered != null && discovered['ip'] != null) {
+      final ip = discovered['ip'].toString();
+      _ipController.text = ip;
+      if (discovered['httpPort'] != null) {
+        _httpPortController.text = discovered['httpPort'].toString();
+      }
+      if (discovered['httpsPort'] != null) {
+        _httpsPortController.text = discovered['httpsPort'].toString();
+      }
+      setState(() {
+        _isLoading = false;
+        _errorMessage = null;
+        _statusText = 'Found Print Ofo PC at $ip! Enter 6-digit PIN to pair.';
+      });
+    } else {
+      setState(() {
+        _isLoading = false;
+        _errorMessage =
+            'Could not find Print Ofo server on Wi-Fi. Ensure PC app is running and connected to same Wi-Fi.';
+      });
+    }
+  }
+
   Future<void> _handleManualConnect() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -179,23 +211,20 @@ class _ConnectScreenState extends State<ConnectScreen>
       return;
     }
 
-    final serverData = discoverResult.data ?? {};
-    final serverName = serverData['serverName'] as String? ?? 'Windows Server';
-    final machineName = serverData['machineName'] as String?;
-    final discoveredThumbprint =
-        serverData['httpsThumbprint'] as String? ?? thumbprint;
+    final serverMeta = discoverResult.data ?? {};
+    final serverName = serverMeta['serverName']?.toString() ?? 'Print Ofo Server';
 
-    // 2. Authenticate with PIN
     setState(() {
-      _statusText = 'Authenticating with PIN...';
+      _statusText = 'Pairing with $serverName...';
     });
 
+    // 2. Authorize with PIN
     final pairResult = await api.pair(
       ip: ip,
       httpPort: httpPort,
       httpsPort: httpsPort,
       pin: pin,
-      deviceName: 'Android Mobile App',
+      deviceName: 'Android Mobile',
     );
 
     if (!pairResult.success) {
@@ -203,46 +232,36 @@ class _ConnectScreenState extends State<ConnectScreen>
         setState(() {
           _isLoading = false;
           _errorMessage = pairResult.errorMessage;
-        });
-        // Delay before allowing re-scan to prevent instant frame loop
-        Future.delayed(const Duration(seconds: 2), () {
-          if (mounted) {
-            setState(() {
-              _isScanningHandled = false;
-            });
-          }
+          _isScanningHandled = false;
         });
       }
       return;
     }
 
-    final token = pairResult.data?['token'] as String?;
+    final token = pairResult.data?['token']?.toString();
+    final clientId = pairResult.data?['clientId']?.toString();
 
-    // 3. Persist paired connection
-    final connection = ServerConnection(
+    // 3. Save connection
+    final conn = ServerConnection(
       ip: ip,
       httpPort: httpPort,
       httpsPort: httpsPort,
       pin: pin,
-      thumbprint: discoveredThumbprint,
       token: token,
       serverName: serverName,
-      machineName: machineName,
-      activeBaseUrl: api.activeBaseUrl,
+      thumbprint: thumbprint,
       lastConnectedAt: DateTime.now(),
       isConnected: true,
     );
 
-    await StorageService().saveServerConnection(connection);
-    api.configure(connection);
+    final storage = StorageService();
+    await storage.saveServerConnection(conn);
+    api.configure(conn);
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Connected & paired with $serverName ($ip)'),
-          backgroundColor: AppTheme.successGreen,
-        ),
-      );
+      setState(() {
+        _isLoading = false;
+      });
       Navigator.of(context).pop(true);
     }
   }
@@ -252,39 +271,45 @@ class _ConnectScreenState extends State<ConnectScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Connect to Computer'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.laptop_chromebook, color: AppTheme.accentCyan),
+            tooltip: 'Get PC App (Microsoft Store)',
+            onPressed: () => DesktopCompanionDialog.show(context),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppTheme.primaryBlue,
           tabs: const [
-            Tab(icon: Icon(Icons.qr_code_scanner), text: 'Scan QR Code'),
-            Tab(icon: Icon(Icons.tune), text: 'Manual Setup'),
+            Tab(icon: Icon(Icons.qr_code_scanner), text: 'Scan QR'),
+            Tab(icon: Icon(Icons.edit_note), text: 'Manual / IP'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildQrTab(),
+          _buildScannerTab(),
           _buildManualTab(),
         ],
       ),
     );
   }
 
-  Widget _buildQrTab() {
+  Widget _buildScannerTab() {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           color: AppTheme.cardDark,
-          child: const Row(
-            children: [
-              Icon(Icons.info_outline, color: AppTheme.accentCyan, size: 20),
+          child: Row(
+            children: const [
+              Icon(Icons.info_outline, color: AppTheme.lightBlue, size: 20),
               SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Point camera at the QR code displayed on the Windows Print Ofo Server dashboard.',
-                  style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                  'Point your camera at the QR code on the Print Ofo Windows desktop screen.',
+                  style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
                 ),
               ),
             ],
@@ -298,12 +323,11 @@ class _ConnectScreenState extends State<ConnectScreen>
                 controller: _scannerController,
                 onDetect: _handleQrDetected,
               ),
-              // Target reticle
               Container(
-                width: 240,
-                height: 240,
+                width: 250,
+                height: 250,
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppTheme.accentCyan, width: 2.5),
+                  border: Border.all(color: AppTheme.lightBlue, width: 2.5),
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
@@ -314,7 +338,7 @@ class _ConnectScreenState extends State<ConnectScreen>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const CircularProgressIndicator(color: Colors.white),
+                        const CircularProgressIndicator(),
                         const SizedBox(height: 16),
                         Text(
                           _statusText ?? 'Connecting...',
@@ -325,25 +349,6 @@ class _ConnectScreenState extends State<ConnectScreen>
                     ),
                   ),
                 ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          color: AppTheme.cardDark,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.flash_on, color: Colors.white),
-                onPressed: () => _scannerController.toggleTorch(),
-                tooltip: 'Toggle Flashlight',
-              ),
-              IconButton(
-                icon: const Icon(Icons.flip_camera_android, color: Colors.white),
-                onPressed: () => _scannerController.switchCamera(),
-                tooltip: 'Switch Camera',
-              ),
             ],
           ),
         ),
@@ -391,13 +396,23 @@ class _ConnectScreenState extends State<ConnectScreen>
               'Find these details on the Print Ofo dashboard on your Windows laptop.',
               style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.wifi_find, color: AppTheme.accentCyan),
+              label: const Text('Auto-Discover PC on Wi-Fi'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                side: const BorderSide(color: AppTheme.accentCyan),
+              ),
+              onPressed: _isLoading ? null : _handleAutoDiscover,
+            ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _ipController,
               keyboardType: TextInputType.datetime,
               decoration: const InputDecoration(
                 labelText: 'Windows Laptop IPv4 Address',
-                hintText: 'e.g. 10.134.68.221 or 192.168.1.100',
+                hintText: 'e.g. 192.168.1.100',
                 prefixIcon: Icon(Icons.laptop, color: AppTheme.lightBlue),
               ),
               validator: (val) {
@@ -530,10 +545,10 @@ class _ConnectScreenState extends State<ConnectScreen>
                   ),
                   SizedBox(height: 6),
                   Text(
-                    '• Ensure phone and laptop are on the same Wi-Fi router / mobile hotspot.\n'
-                    '• On Windows, check that Private network firewall rule is active.\n'
-                    '• Make sure the Print Ofo Server is running on the laptop.\n'
-                    '• Some public/guest Wi-Fi isolate devices (client isolation). Use a home network or phone hotspot.',
+                    'â€¢ Ensure phone and laptop are on the same Wi-Fi router / mobile hotspot.\n'
+                    'â€¢ On Windows, check that Private network firewall rule is active.\n'
+                    'â€¢ Make sure the Print Ofo Server is running on the laptop.\n'
+                    'â€¢ Once paired once, connection is preserved automatically without entering PIN again.',
                     style: TextStyle(fontSize: 11, color: AppTheme.textMuted, height: 1.4),
                   ),
                 ],
