@@ -1,0 +1,39 @@
+﻿# Created with Windows Package Manager (winget) manifest specification
+PackageIdentifier: PrintOfo.PrintOfo
+PackageVersion: 1.1.0
+PackageName: Print Ofo
+Publisher: Print Ofo
+PublisherUrl: https://github.com/kkrkishan/kkr-wireless-print
+PublisherSupportUrl: https://github.com/kkrkishan/kkr-wireless-print/issues
+PrivacyUrl: https://github.com/kkrkishan/kkr-wireless-print/blob/main/README.md
+Author: Kishan
+License: MIT
+LicenseUrl: https://github.com/kkrkishan/kkr-wireless-print/blob/main/LICENSE
+Copyright: Copyright (c) 2026 Print Ofo
+ShortDescription: High-speed local wireless print server for Windows & Android.
+Description: Print Ofo transforms your Windows PC into a local wireless print engine for printing PDFs and high-res photos from Android smartphones directly to USB printers.
+Tags:
+  - print
+  - wireless
+  - printer
+  - wifi
+  - android
+  - canon
+  - epson
+PackageLocale: en-US
+Installers:
+  - Architecture: x64
+    InstallerType: inno
+    InstallerUrl: https://github.com/kkrkishan/kkr-wireless-print/releases/download/v1.1.0/Print_Ofo_Setup.exe
+    InstallerSha256: F83541FEE509837E8371B0A5E8A253113DD9DE6B011A363498E6BA2445DBADFB
+    Scope: machine
+    InstallModes:
+      - interactive
+      - silent
+      - silentWithProgress
+    InstallerSwitches:
+      Silent: /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+      SilentWithProgress: /SILENT /SUPPRESSMSGBOXES /NORESTART
+    UpgradeBehavior: install
+ManifestType: singleton
+ManifestVersion: 1.6.0
