@@ -208,11 +208,11 @@ class ApiService {
     required String pin,
     String deviceName = 'Android Mobile',
   }) async {
-    final urlsToTry = [
+    final urlsToTry = <String>{
       if (_activeBaseUrl.isNotEmpty) _activeBaseUrl,
       'http://$ip:$httpPort',
       if (httpsPort > 0) 'https://$ip:$httpsPort',
-    ].toSet().toList();
+    }.toList();
 
     String? lastError;
     for (final base in urlsToTry) {

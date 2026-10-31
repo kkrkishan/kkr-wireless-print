@@ -1,7 +1,5 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:kkr_wireless_print/ui/widgets/desktop_companion_dialog.dart';
-import 'package:kkr_wireless_print/ui/widgets/desktop_companion_dialog.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kkr_wireless_print/models/server_connection.dart';
 import 'package:kkr_wireless_print/models/printer_info.dart';

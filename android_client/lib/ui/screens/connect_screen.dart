@@ -239,7 +239,6 @@ class _ConnectScreenState extends State<ConnectScreen>
     }
 
     final token = pairResult.data?['token']?.toString();
-    final clientId = pairResult.data?['clientId']?.toString();
 
     // 3. Save connection
     final conn = ServerConnection(
