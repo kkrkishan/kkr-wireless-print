@@ -14,6 +14,7 @@
     <title type='text'>Print Ofo — Wireless USB &amp; Network Printing from Mobile to Windows PC (Official Guide &amp; Download)</title>
     <content type='html'><![CDATA[<div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; line-height: 1.7; max-width: 900px; margin: 0 auto;">
 
+  <!-- HERO BANNER -->
   <div style="background: linear-gradient(135deg, #1e3a8a 0%, #0284c7 100%); color: #ffffff; padding: 45px 30px; border-radius: 16px; text-align: center; margin-bottom: 35px; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.25);">
     <div style="display: inline-block; background: rgba(255, 255, 255, 0.2); padding: 5px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-bottom: 15px; letter-spacing: 0.5px;">
       OFFICIAL RELEASE v1.1.0 • 100% FREE &amp; OFFLINE
@@ -24,7 +25,7 @@
     <p style="font-size: 17px; max-width: 720px; margin: 0 auto 25px; opacity: 0.95; line-height: 1.6;">
       Turn any non-Wi-Fi USB printer (Canon, Epson, HP, Brother) into an ultra-fast wireless printer. Share directly from Android Gallery or Files without expensive hardware or internet!
     </p>
-    <div>
+    <div style="margin-bottom: 25px;">
       <a href="https://github.com/kkrkishan/kkr-wireless-print/releases/download/v1.1.0/Print_Ofo_Setup.exe" style="display: inline-block; background: #ffffff; color: #1e3a8a; font-weight: 700; padding: 14px 28px; border-radius: 10px; text-decoration: none; margin: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
         💻 Download Windows Server (.exe)
       </a>
@@ -32,9 +33,92 @@
         📱 Download Android APK
       </a>
     </div>
+
+    <!-- HERO IMAGE PREVIEW -->
+    <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.2);">
+      <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_1_Dashboard_1920x1080.png" alt="Print Ofo Windows Server Dashboard" style="width: 100%; height: auto; border-radius: 8px; display: block;" />
+    </div>
   </div>
 
-  <h2 style="color: #0f172a; font-size: 24px; border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-top: 35px;">
+  <!-- SCREENSHOTS GALLERY -->
+  <h2 style="color: #0f172a; font-size: 24px; border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-top: 40px;">
+    App Screenshots &amp; User Interface
+  </h2>
+
+  <!-- Windows Screenshots -->
+  <h3 style="color: #1e3a8a; font-size: 19px; margin-top: 25px;">
+    💻 Windows Desktop Server (v1.1.0)
+  </h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; margin: 15px 0;">
+    <div style="border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: #f8fafc;">
+      <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_1_Dashboard_1920x1080.png" alt="Server Dashboard" style="width: 100%; display: block;" />
+      <div style="padding: 12px 16px;">
+        <b style="color: #0f172a;">1. Real-Time Server Dashboard</b>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Live server status, local IP, ports (HTTP 8080 / HTTPS 8443) and connected devices.</p>
+      </div>
+    </div>
+
+    <div style="border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: #f8fafc;">
+      <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_2_Printers_1920x1080.png" alt="Printers Discovery" style="width: 100%; display: block;" />
+      <div style="padding: 12px 16px;">
+        <b style="color: #0f172a;">2. Native Spooler Printers</b>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Auto-detects Canon, Epson, HP, and all Windows spooler printers with online status.</p>
+      </div>
+    </div>
+
+    <div style="border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: #f8fafc;">
+      <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_3_Pairing_Security_1920x1080.png" alt="Pairing Security" style="width: 100%; display: block;" />
+      <div style="padding: 12px 16px;">
+        <b style="color: #0f172a;">3. QR Code &amp; 6-Digit PIN Pairing</b>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Encrypted local pairing token saved permanently. Reconnects on PC boot.</p>
+      </div>
+    </div>
+
+    <div style="border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: #f8fafc;">
+      <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_4_SpoolerQueue_1920x1080.png" alt="Spooler Queue" style="width: 100%; display: block;" />
+      <div style="padding: 12px 16px;">
+        <b style="color: #0f172a;">4. Live Spooler Queue</b>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Monitors active print jobs, pages printed, and document transfer status.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Screenshots -->
+  <h3 style="color: #0284c7; font-size: 19px; margin-top: 30px;">
+    📱 Android Mobile App (Material 3)
+  </h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 15px 0;">
+    <div style="border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: #f8fafc; text-align: center;">
+      <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_1_Home_1080x2400.png" alt="Mobile Home Screen" style="width: 100%; display: block;" />
+      <div style="padding: 10px;">
+        <b style="color: #0f172a; font-size: 14px;">Home Screen</b>
+      </div>
+    </div>
+
+    <div style="border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: #f8fafc; text-align: center;">
+      <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_2_Scanner_Connect_1080x2400.png" alt="Fast Connect Scanner" style="width: 100%; display: block;" />
+      <div style="padding: 10px;">
+        <b style="color: #0f172a; font-size: 14px;">Fast Connect</b>
+      </div>
+    </div>
+
+    <div style="border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: #f8fafc; text-align: center;">
+      <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_3_Preview_Settings_1080x2400.png" alt="Preview &amp; Settings" style="width: 100%; display: block;" />
+      <div style="padding: 10px;">
+        <b style="color: #0f172a; font-size: 14px;">Print Settings</b>
+      </div>
+    </div>
+
+    <div style="border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; background: #f8fafc; text-align: center;">
+      <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_4_Spooler_Tracking_1080x2400.png" alt="Spooler Tracking" style="width: 100%; display: block;" />
+      <div style="padding: 10px;">
+        <b style="color: #0f172a; font-size: 14px;">Print Tracking</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEM & SOLUTION -->
+  <h2 style="color: #0f172a; font-size: 24px; border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-top: 40px;">
     The Problem with Mobile-to-Printer Printing
   </h2>
   <p style="font-size: 16px;">
@@ -52,6 +136,7 @@
     <b>Print Ofo solves this permanently:</b> You simply open the photo or PDF on your Android phone, tap <b>Share &gt; Print Ofo</b>, and it prints directly through your Windows laptop in under 2 seconds!
   </p>
 
+  <!-- KEY FEATURES TABLE / CARDS -->
   <h2 style="color: #0f172a; font-size: 24px; border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-top: 40px;">
     Key Features of Print Ofo (v1.1.0)
   </h2>
@@ -108,6 +193,7 @@
 
   </div>
 
+  <!-- HOW TO SETUP (3 STEPS) -->
   <h2 style="color: #0f172a; font-size: 24px; border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-top: 40px;">
     Quick Setup Guide (Under 2 Minutes)
   </h2>
@@ -126,6 +212,7 @@
     </ol>
   </div>
 
+  <!-- SUPPORTED PRINTERS LIST -->
   <h2 style="color: #0f172a; font-size: 24px; border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-top: 40px;">
     Tested &amp; Supported Printers
   </h2>
@@ -141,6 +228,7 @@
     <li><b>Virtual:</b> Microsoft Print to PDF, OneNote</li>
   </ul>
 
+  <!-- DOWNLOAD LINKS & SUMMARY TABLE -->
   <h2 style="color: #0f172a; font-size: 24px; border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-top: 40px;">
     Official Downloads &amp; Packages (v1.1.0)
   </h2>
@@ -182,6 +270,7 @@
     </tbody>
   </table>
 
+  <!-- FAQ SECTION -->
   <h2 style="color: #0f172a; font-size: 24px; border-bottom: 2px solid #0284c7; padding-bottom: 8px; margin-top: 45px;">
     Frequently Asked Questions
   </h2>
@@ -203,6 +292,7 @@
     </div>
   </div>
 
+  <!-- FOOTER NOTICE -->
   <div style="background: #f1f5f9; padding: 20px; border-radius: 10px; margin-top: 40px; text-align: center; font-size: 13px; color: #64748b;">
     Developed by <b>KKR Kishan</b> • Open Source on <a href="https://github.com/kkrkishan/kkr-wireless-print" style="color: #0284c7;">GitHub</a> • For technical support and updates visit <a href="https://printofo.blogspot.com/" style="color: #0284c7;">printofo.blogspot.com</a>
   </div>

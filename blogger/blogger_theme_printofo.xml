@@ -10,6 +10,7 @@
   <meta content='Print Ofo — Smart Wireless Printing' property='og:title'/>
   <meta content='https://printofo.blogspot.com/' property='og:url'/>
   <meta content='website' property='og:type'/>
+  <meta content='https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/playstore_feature_graphic_1024x500.png' property='og:image'/>
   <meta content='Print photos, PDFs, and documents directly from Android Gallery to any USB or Network printer connected to your Windows computer.' property='og:description'/>
   <link href='https://fonts.googleapis.com' rel='preconnect'/>
   <link crossorigin='' href='https://fonts.gstatic.com' rel='preconnect'/>
@@ -169,7 +170,7 @@
 
     /* ---------------- HERO SECTION ---------------- */
     .hero {
-      padding: 90px 0 60px;
+      padding: 90px 0 40px;
       text-align: center;
       position: relative;
     }
@@ -224,7 +225,7 @@
       align-items: center;
       gap: 16px;
       flex-wrap: wrap;
-      margin-bottom: 48px;
+      margin-bottom: 40px;
     }
 
     .btn-primary {
@@ -275,6 +276,7 @@
       font-size: 0.88rem;
       color: var(--text-dim);
       flex-wrap: wrap;
+      margin-bottom: 50px;
     }
 
     .hero-meta span {
@@ -283,9 +285,32 @@
       gap: 6px;
     }
 
+    /* ---------------- HERO MOCKUP PREVIEW ---------------- */
+    .hero-mockup-wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.2) 0%, rgba(37, 99, 235, 0.05) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 50px rgba(37, 99, 235, 0.2);
+      transition: transform 0.4s ease;
+    }
+
+    .hero-mockup-wrapper:hover {
+      transform: translateY(-4px);
+    }
+
+    .hero-mockup-img {
+      width: 100%;
+      height: auto;
+      border-radius: calc(var(--radius-lg) - 4px);
+      display: block;
+    }
+
     /* ---------------- STATS COUNTER BAR ---------------- */
     .stats-bar {
-      margin: 40px auto 70px;
+      margin: 50px auto 70px;
       background: rgba(15, 23, 42, 0.6);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
@@ -309,7 +334,7 @@
       font-weight: 500;
     }
 
-    /* ---------------- PROBLEM & SOLUTION ---------------- */
+    /* ---------------- SECTION HEADERS ---------------- */
     .section-header {
       text-align: center;
       margin-bottom: 56px;
@@ -339,6 +364,124 @@
       font-size: 1.05rem;
     }
 
+    /* ---------------- SCREENSHOTS GALLERY SECTION ---------------- */
+    .screenshots-section {
+      padding: 40px 0 90px;
+    }
+
+    .gallery-subhead {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 40px 0 24px;
+      font-size: 1.35rem;
+      color: var(--text-main);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+
+    .gallery-subhead span.badge {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      color: #60a5fa;
+      font-weight: 600;
+    }
+
+    .desktop-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+      gap: 28px;
+      margin-bottom: 60px;
+    }
+
+    @media (max-width: 600px) {
+      .desktop-gallery-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mobile-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .shot-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .shot-card:hover {
+      border-color: var(--border-highlight);
+      transform: translateY(-5px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    }
+
+    .shot-img-wrap {
+      background: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .shot-card.mobile .shot-img-wrap {
+      padding: 16px;
+      background: radial-gradient(circle at center, rgba(37, 99, 235, 0.1) 0%, #030712 100%);
+    }
+
+    .shot-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .shot-card.mobile img {
+      max-width: 240px;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .shot-card:hover img {
+      transform: scale(1.02);
+    }
+
+    .shot-caption {
+      padding: 20px;
+      flex-grow: 1;
+    }
+
+    .shot-caption h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .shot-caption p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ---------------- PROBLEM & SOLUTION ---------------- */
     .comparison-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -771,6 +914,7 @@
 
       <ul class='nav-links'>
         <li><a href='#features'>Features</a></li>
+        <li><a href='#screenshots'>Screenshots</a></li>
         <li><a href='#how-it-works'>How it Works</a></li>
         <li><a href='#printers'>Supported Printers</a></li>
         <li><a href='#download'>Download</a></li>
@@ -813,6 +957,11 @@
         <span>✨ Windows 10/11 &amp; Android 5-15</span>
       </div>
 
+      <!-- HERO APP SCREENSHOT PREVIEW -->
+      <div class='hero-mockup-wrapper'>
+        <img alt='Print Ofo Windows Server Dashboard Overview' class='hero-mockup-img' src='https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_1_Dashboard_1920x1080.png'/>
+      </div>
+
       <!-- STATS BAR -->
       <div class='stats-bar'>
         <div class='stat-item'>
@@ -830,6 +979,119 @@
         <div class='stat-item'>
           <h3>64-bit</h3>
           <p>Self-Contained .NET 8 Engine</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS GALLERY SECTION -->
+  <section class='container screenshots-section' id='screenshots'>
+    <div class='section-header'>
+      <span class='section-tag'>User Interface Preview</span>
+      <h2 class='section-title'>Clean, Modern &amp; Lightning Fast</h2>
+      <p class='section-desc'>Explore the intuitive desktop dashboard and mobile application designed for effortless wireless printing.</p>
+    </div>
+
+    <!-- WINDOWS DESKTOP SCREENSHOTS -->
+    <div class='gallery-subhead'>
+      <span>💻 Windows Desktop Server Interface</span>
+      <span class='badge'>Self-Contained .NET 8 WPF</span>
+    </div>
+
+    <div class='desktop-gallery-grid'>
+      <!-- Shot 1 -->
+      <div class='shot-card'>
+        <div class='shot-img-wrap'>
+          <img alt='Windows Server Dashboard' src='https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_1_Dashboard_1920x1080.png'/>
+        </div>
+        <div class='shot-caption'>
+          <h4>📊 Real-Time Server Dashboard</h4>
+          <p>View server status, active IP address, HTTP (8080) &amp; HTTPS (8443) ports, and total connected clients at a single glance.</p>
+        </div>
+      </div>
+
+      <!-- Shot 2 -->
+      <div class='shot-card'>
+        <div class='shot-img-wrap'>
+          <img alt='Printers Management Screen' src='https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_2_Printers_1920x1080.png'/>
+        </div>
+        <div class='shot-caption'>
+          <h4>🖨️ Native Spooler Printers Detection</h4>
+          <p>Automatic detection of Canon, Epson, HP, and all physical or virtual printers connected to Windows with real-time status indicators.</p>
+        </div>
+      </div>
+
+      <!-- Shot 3 -->
+      <div class='shot-card'>
+        <div class='shot-img-wrap'>
+          <img alt='Pairing &amp; Security Screen' src='https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_3_Pairing_Security_1920x1080.png'/>
+        </div>
+        <div class='shot-caption'>
+          <h4>🔐 QR Code &amp; 6-Digit PIN Pairing</h4>
+          <p>Secure local pairing with rotating 6-digit PIN and QR code. Generates persistent authorization tokens so re-pairing is never needed.</p>
+        </div>
+      </div>
+
+      <!-- Shot 4 -->
+      <div class='shot-card'>
+        <div class='shot-img-wrap'>
+          <img alt='Print Queue &amp; Spooler Tracking' src='https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_4_SpoolerQueue_1920x1080.png'/>
+        </div>
+        <div class='shot-caption'>
+          <h4>📋 Live Print Spooler Queue</h4>
+          <p>Monitor incoming mobile print jobs, pages printed, file transfer sizes, and spooling status in real-time without print failures.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANDROID MOBILE SCREENSHOTS -->
+    <div class='gallery-subhead'>
+      <span>📱 Android Mobile Application Interface</span>
+      <span class='badge'>Flutter Material 3 (Target SDK 35)</span>
+    </div>
+
+    <div class='mobile-gallery-grid'>
+      <!-- Mobile 1 -->
+      <div class='shot-card mobile'>
+        <div class='shot-img-wrap'>
+          <img alt='Android Mobile Home Screen' src='https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_1_Home_1080x2400.png'/>
+        </div>
+        <div class='shot-caption'>
+          <h4>🏠 Mobile Home Screen</h4>
+          <p>Instant server connectivity status, 1-tap print launcher, and quick access to PC companion setup.</p>
+        </div>
+      </div>
+
+      <!-- Mobile 2 -->
+      <div class='shot-card mobile'>
+        <div class='shot-img-wrap'>
+          <img alt='QR Scanner and Wi-Fi Connect' src='https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_2_Scanner_Connect_1080x2400.png'/>
+        </div>
+        <div class='shot-caption'>
+          <h4>📡 Fast QR &amp; UDP Connect</h4>
+          <p>Scan desktop QR code or let UDP beacon detect your laptop automatically over Wi-Fi.</p>
+        </div>
+      </div>
+
+      <!-- Mobile 3 -->
+      <div class='shot-card mobile'>
+        <div class='shot-img-wrap'>
+          <img alt='Print Preview &amp; Settings' src='https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_3_Preview_Settings_1080x2400.png'/>
+        </div>
+        <div class='shot-caption'>
+          <h4>⚙️ Document Preview &amp; Layout</h4>
+          <p>Visual document viewer with options for copies, color/monochrome, paper size, and duplex.</p>
+        </div>
+      </div>
+
+      <!-- Mobile 4 -->
+      <div class='shot-card mobile'>
+        <div class='shot-img-wrap'>
+          <img alt='Spooler Job Tracking' src='https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_4_Spooler_Tracking_1080x2400.png'/>
+        </div>
+        <div class='shot-caption'>
+          <h4>✅ Real-time Print Tracking</h4>
+          <p>Watch your document spool to the physical printer with progress bar and instant completion confirmation.</p>
         </div>
       </div>
     </div>
@@ -1103,6 +1365,7 @@
           <h4>Navigation</h4>
           <ul>
             <li><a href='#features'>Features</a></li>
+            <li><a href='#screenshots'>App Screenshots</a></li>
             <li><a href='#how-it-works'>How it Works</a></li>
             <li><a href='#printers'>Compatible Printers</a></li>
             <li><a href='#download'>Download Center</a></li>
