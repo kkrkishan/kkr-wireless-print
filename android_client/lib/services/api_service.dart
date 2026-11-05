@@ -84,6 +84,14 @@ class ApiService {
 
       // Send to broadcast address
       socket.send(probeBytes, InternetAddress('255.255.255.255'), 8089);
+      if (_currentConnection?.ip != null && _currentConnection!.ip.contains('.')) {
+        final parts = _currentConnection!.ip.split('.');
+        if (parts.length == 4) {
+          try {
+            socket.send(probeBytes, InternetAddress('${parts[0]}.${parts[1]}.${parts[2]}.255'), 8089);
+          } catch (_) {}
+        }
+      }
 
       final timer = Timer(timeout, () {
         if (!completer.isCompleted) {
@@ -128,13 +136,24 @@ class ApiService {
   }) async {
     configure(savedConnection);
 
-    // 1. Try saved endpoint first
-    var printerRes = await getPrinters();
-    if (printerRes.success) {
-      return printerRes;
-    }
+    // 1. Try saved endpoint first with fast 3s connection check
+    try {
+      final fastRes = await _dio.get(
+        '${savedConnection.effectiveBaseUrl}/api/v1/printers',
+        options: Options(
+          sendTimeout: const Duration(seconds: 3),
+          receiveTimeout: const Duration(seconds: 4),
+        ),
+      );
+      if (fastRes.statusCode == 200 && fastRes.data is List) {
+        final printers = (fastRes.data as List)
+            .map((item) => PrinterInfo.fromJson(Map<String, dynamic>.from(item)))
+            .toList();
+        return ApiResult.success(printers);
+      }
+    } catch (_) {}
 
-    // 2. If saved endpoint is unreachable, auto-discover laptop over Wi-Fi
+    // 2. If saved endpoint is unreachable or IP changed, auto-discover laptop over Wi-Fi
     final discovered = await discoverServer();
     if (discovered != null && discovered['ip'] != null) {
       final newIp = discovered['ip'].toString();
@@ -150,14 +169,14 @@ class ApiService {
       );
 
       configure(updatedConnection);
-      printerRes = await getPrinters();
+      final printerRes = await getPrinters();
       if (printerRes.success) {
         onIpUpdated?.call(updatedConnection);
         return printerRes;
       }
     }
 
-    return printerRes;
+    return getPrinters();
   }
 
   /// Test connection & discover server metadata

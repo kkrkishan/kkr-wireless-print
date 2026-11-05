@@ -39,7 +39,7 @@ public static class AutoStartupService
             if (enable)
             {
                 string exePath = Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty;
-                if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath))
+                if (string.IsNullOrEmpty(exePath) || exePath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase) || !File.Exists(exePath))
                 {
                     exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PrintOfo.Server.exe");
                 }

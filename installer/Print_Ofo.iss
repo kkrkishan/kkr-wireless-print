@@ -43,8 +43,12 @@ DisableProgramGroupPage=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
+Name: "autostart"; Description: "Start Print Ofo automatically in the background when Windows starts up"; GroupDescription: "System Startup:"; Flags: checkedonce
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
 Name: "firewallrule"; Description: "Configure Windows Firewall for local Wi-Fi & LAN mobile access (Ports 8080 & 8443)"; GroupDescription: "Network Configuration:"; Flags: checkedonce
+
+[Registry]
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "PrintOfoServer"; ValueData: """{app}\{#MyAppExeName}"" --autostart"; Flags: uninsdeletevalue; Tasks: autostart
 
 [Files]
 Source: "..\build\publish\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs

@@ -1,5 +1,6 @@
+using System;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using KKR.PrintServer.Api.Server;
@@ -84,9 +85,25 @@ public partial class App : Application
 
             _mainViewModel = new MainViewModel(config, discoveryService, securityService, certService, printProcessor, queueService, apiHost);
 
+            // Automatically ensure Windows autostart is registered in HKCU\...\Run
+            AutoStartupService.SetAutoStart(true);
+
+            bool startMinimized = e.Args.Any(a =>
+                a.Equals("--autostart", StringComparison.OrdinalIgnoreCase) ||
+                a.Equals("--background", StringComparison.OrdinalIgnoreCase) ||
+                a.Equals("-minimized", StringComparison.OrdinalIgnoreCase));
+
             var mainWindow = new MainWindow { DataContext = _mainViewModel };
             MainWindow = mainWindow;
-            mainWindow.Show();
+
+            if (!startMinimized)
+            {
+                mainWindow.Show();
+            }
+            else
+            {
+                AppLogger.Instance.Info("App", "Started silently in background (system tray).");
+            }
 
             // Auto-start API server on launch
             await _mainViewModel.StartServerAsync();

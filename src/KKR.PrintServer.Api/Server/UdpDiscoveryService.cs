@@ -16,15 +16,17 @@ public class UdpDiscoveryService : IDisposable
     private UdpClient? _udpClient;
     private CancellationTokenSource? _cts;
     private bool _isRunning;
+    private Func<string>? _ipProvider;
 
     public UdpDiscoveryService(ServerConfig config)
     {
         _config = config;
     }
 
-    public void Start(string currentIp)
+    public void Start(string currentIp, Func<string>? ipProvider = null)
     {
         if (_isRunning) return;
+        _ipProvider = ipProvider;
 
         try
         {
@@ -45,7 +47,7 @@ public class UdpDiscoveryService : IDisposable
         }
     }
 
-    private async Task ListenLoopAsync(string currentIp, CancellationToken token)
+    private async Task ListenLoopAsync(string defaultIp, CancellationToken token)
     {
         while (!token.IsCancellationRequested && _udpClient != null)
         {
@@ -56,10 +58,11 @@ public class UdpDiscoveryService : IDisposable
 
                 if (message.Contains("PRINT_OFO_DISCOVER"))
                 {
+                    string activeIp = _ipProvider?.Invoke() ?? defaultIp;
                     var responseJson = System.Text.Json.JsonSerializer.Serialize(new
                     {
                         serverName = "Print Ofo Server",
-                        ip = currentIp,
+                        ip = activeIp,
                         httpPort = _config.HttpPort,
                         httpsPort = _config.HttpsPort,
                         machineName = Environment.MachineName,
@@ -68,7 +71,7 @@ public class UdpDiscoveryService : IDisposable
 
                     byte[] responseBytes = Encoding.UTF8.GetBytes(responseJson);
                     await _udpClient.SendAsync(responseBytes, responseBytes.Length, result.RemoteEndPoint);
-                    AppLogger.Instance.Info("Discovery", $"Responded to discovery probe from {result.RemoteEndPoint.Address}");
+                    AppLogger.Instance.Info("Discovery", $"Responded to discovery probe from {result.RemoteEndPoint.Address} with IP {activeIp}");
                 }
             }
             catch (OperationCanceledException)
@@ -84,21 +87,23 @@ public class UdpDiscoveryService : IDisposable
         }
     }
 
-    private async Task BroadcastBeaconLoopAsync(string currentIp, CancellationToken token)
+    private async Task BroadcastBeaconLoopAsync(string defaultIp, CancellationToken token)
     {
         var broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, DiscoveryPort);
         while (!token.IsCancellationRequested && _udpClient != null)
         {
             try
             {
+                string activeIp = _ipProvider?.Invoke() ?? defaultIp;
                 var beaconJson = System.Text.Json.JsonSerializer.Serialize(new
                 {
                     type = "PRINT_OFO_BEACON",
                     serverName = "Print Ofo Server",
-                    ip = currentIp,
+                    ip = activeIp,
                     httpPort = _config.HttpPort,
                     httpsPort = _config.HttpsPort,
-                    machineName = Environment.MachineName
+                    machineName = Environment.MachineName,
+                    version = "1.1.0"
                 });
 
                 byte[] beaconBytes = Encoding.UTF8.GetBytes(beaconJson);
@@ -111,7 +116,7 @@ public class UdpDiscoveryService : IDisposable
 
             try
             {
-                await Task.Delay(5000, token);
+                await Task.Delay(3000, token);
             }
             catch (OperationCanceledException)
             {

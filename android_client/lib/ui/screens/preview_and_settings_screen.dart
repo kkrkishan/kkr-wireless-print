@@ -78,14 +78,25 @@ class _PreviewAndSettingsScreenState extends State<PreviewAndSettingsScreen> {
 
     try {
       final api = ApiService();
-      if (!api.isAuthenticated) {
-        final conn = await StorageService().loadServerConnection();
-        if (conn != null && conn.token != null) {
-          api.configure(conn);
-        }
-      }
+      final conn = await StorageService().loadServerConnection();
 
-      if (api.isAuthenticated) {
+      if (conn != null && conn.token != null) {
+        final res = await api.autoReconnectAndGetPrinters(
+          conn,
+          onIpUpdated: (updated) async {
+            await StorageService().saveServerConnection(updated);
+          },
+        );
+
+        if (mounted && res.success && res.data != null && res.data!.isNotEmpty) {
+          setState(() {
+            _printers = res.data!;
+            _selectInitialPrinter(null);
+            _isLoadingPrinters = false;
+          });
+          return;
+        }
+      } else if (api.isAuthenticated) {
         final res = await api.getPrinters();
         if (mounted && res.success && res.data != null && res.data!.isNotEmpty) {
           setState(() {

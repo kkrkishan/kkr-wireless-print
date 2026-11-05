@@ -118,7 +118,7 @@ public class PrintApiHost
         try
         {
             _udpDiscovery = new UdpDiscoveryService(_config);
-            _udpDiscovery.Start(GetDisplayIp());
+            _udpDiscovery.Start(GetDisplayIp(), () => GetDisplayIp());
         }
         catch (Exception ex)
         {
