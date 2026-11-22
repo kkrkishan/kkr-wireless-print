@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Print Ofo — Wireless Mobile Printing to Any USB Printer via Windows</title>
+  
+  <!-- SEO & Meta -->
+  <meta name="description" content="Print Ofo turns any USB printer (Canon, Epson, HP, Brother) into a fast wireless printer. Print directly from Android Gallery or PDF via Windows PC over local Wi-Fi. 100% Free & Offline." />
+  <meta name="keywords" content="Print Ofo, wireless print, USB printer wireless, Android to PC printer, Canon MF4800 wireless print, Epson L3210 mobile print, offline printer share" />
+  <meta name="author" content="KKR Kishan" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://printofo.vercel.app/" />
+  <meta property="og:title" content="Print Ofo — Wireless Mobile Printing to Any USB Printer" />
+  <meta property="og:description" content="Print wirelessly from Android to non-Wi-Fi USB printers via Windows PC. 100% Free, Private & Offline." />
+  <meta property="og:image" content="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Feature_Graphic_1024x500.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Print Ofo — Wireless Mobile Printing to Any USB Printer" />
+  <meta name="twitter:description" content="Turn any USB printer into a wireless printer with your Windows PC and Android phone. 100% Free & Offline." />
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Feature_Graphic_1024x500.png" />
+
+  <link rel="icon" type="image/png" href="store_assets/Square44x44Logo.png" />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --primary-light: #e0f2fe;
+      --secondary: #1e3a8a;
+      --accent: #2563eb;
+      --dark: #0f172a;
+      --slate: #334155;
+      --muted: #64748b;
+      --light-bg: #f8fafc;
+      --card-border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.15), 0 8px 10px -6px rgba(2, 132, 199, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--slate);
+      background-color: #ffffff;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    a:hover {
+      color: var(--primary-dark);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header / Navbar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .nav-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--dark);
+    }
+
+    .brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--slate);
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .nav-cta {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+    }
+
+    .btn-primary:hover {
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: var(--dark);
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+      color: var(--dark);
+      transform: translateY(-2px);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+      background: radial-gradient(circle at 50% 20%, #f0f9ff 0%, #ffffff 80%);
+      overflow: hidden;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 6px 18px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(2, 132, 199, 0.2);
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--dark);
+      line-height: 1.2;
+      max-width: 950px;
+      margin: 0 auto 20px;
+      letter-spacing: -1px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 760px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions .btn {
+      padding: 16px 32px;
+      font-size: 16px;
+    }
+
+    .feature-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 32px;
+      padding: 24px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .feature-strip span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Hero Preview Mockup */
+    .hero-preview {
+      margin-top: 50px;
+      position: relative;
+    }
+
+    .preview-window {
+      background: #0f172a;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+
+    .window-header {
+      display: flex;
+      gap: 8px;
+      padding: 6px 12px 14px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .preview-window img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      display: block;
+    }
+
+    /* Section Styles */
+    section {
+      padding: 90px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 60px;
+    }
+
+    .section-title .subheading {
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+
+    .section-title h2 {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--dark);
+      letter-spacing: -0.5px;
+      line-height: 1.25;
+      margin-bottom: 14px;
+    }
+
+    .section-title p {
+      font-size: 17px;
+      color: var(--muted);
+    }
+
+    /* Problem vs Solution */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .comparison-card {
+      padding: 36px;
+      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+    }
+
+    .card-problem {
+      background: #fff1f2;
+      border-color: #fecdd3;
+    }
+
+    .card-solution {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.2);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-problem .card-title { color: #be123c; }
+    .card-solution .card-title { color: #15803d; }
+
+    .step-list {
+      list-style: none;
+    }
+
+    .step-list li {
+      margin-bottom: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 28px;
+    }
+
+    .feature-card {
+      background: #ffffff;
+      padding: 32px;
+      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* Screenshots Showcase with Tabs */
+    .showcase-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .tab-btn {
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-size: 15px;
+      font-weight: 700;
+      background: var(--light-bg);
+      border: 1px solid var(--card-border);
+      color: var(--slate);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .gallery-item {
+      background: #ffffff;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      transition: transform 0.2s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-4px);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .gallery-info {
+      padding: 16px 20px;
+    }
+
+    .gallery-info h4 {
+      color: var(--dark);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .gallery-info p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Setup Steps */
+    .steps-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      position: relative;
+    }
+
+    .step-box {
+      background: var(--light-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 36px 28px;
+      text-align: center;
+      position: relative;
+    }
+
+    .step-number {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 auto 20px;
+    }
+
+    .step-box h3 {
+      color: var(--dark);
+      font-size: 19px;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .step-box p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Downloads Cards */
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 24px;
+    }
+
+    .download-card {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      position: relative;
+    }
+
+    .download-card.highlight {
+      border: 2px solid var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .download-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: #ffffff;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .download-icon {
+      font-size: 38px;
+      margin-bottom: 14px;
+    }
+
+    .download-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    .download-card .file-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* FAQ */
+    .faq-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--card-border);
+      padding: 24px 0;
+    }
+
+    .faq-question {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+
+    .faq-answer {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--dark);
+      color: #94a3b8;
+      padding: 60px 0 30px;
+      font-size: 14px;
+    }
+
+    .footer-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-brand {
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: #94a3b8;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 30px;
+      font-size: 13px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero h1 { font-size: 36px; }
+      .comparison-grid { grid-template-columns: 1fr; }
+      .steps-container { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container nav-wrapper">
+      <a href="/" class="brand">
+        <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Square44x44Logo.png" alt="Print Ofo Logo" />
+        <span>Print Ofo</span>
+      </a>
+      
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#screenshots">Screenshots</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#printers">Printers</a></li>
+        <li><a href="#downloads">Downloads</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+
+      <div class="nav-cta">
+        <a href="https://github.com/kkrkishan/kkr-wireless-print" target="_blank" class="btn btn-secondary">
+          ⭐ GitHub
+        </a>
+        <a href="#downloads" class="btn btn-primary">
+          📥 Get v1.1.0
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="container">
+      <div class="badge-pill">
+        ✨ Official Release v1.1.0 • 100% Free &amp; Offline
+      </div>
+      
+      <h1>
+        Print Wirelessly from Android to Any <span>USB Printer</span> via Windows
+      </h1>
+      
+      <p>
+        Turn your non-Wi-Fi USB printer (Canon, Epson, HP, Brother) into an ultra-fast wireless printer. Share directly from your Android Gallery or Files without expensive network hardware or internet!
+      </p>
+
+      <div class="hero-actions">
+        <a href="https://github.com/kkrkishan/kkr-wireless-print/releases/download/v1.1.0/Print_Ofo_Setup.exe" class="btn btn-primary">
+          💻 Download Windows Server (.exe)
+        </a>
+        <a href="https://github.com/kkrkishan/kkr-wireless-print/releases/download/v1.1.0/Print_Ofo_Mobile_v1.1.0.apk" class="btn btn-secondary">
+          📱 Download Android APK
+        </a>
+        <a href="https://github.com/kkrkishan/kkr-wireless-print/releases/download/v1.1.0/Print_Ofo.msix" class="btn btn-secondary">
+          🏬 Microsoft Store (.msix)
+        </a>
+      </div>
+
+      <div class="feature-strip">
+        <span>⚡ <b>Instant UDP Discovery</b></span>
+        <span>🔒 <b>100% Offline &amp; Private</b></span>
+        <span>🖨️ <b>Native Spooler Integration</b></span>
+        <span>🔄 <b>Auto-Connect on Wi-Fi</b></span>
+      </div>
+
+      <!-- Preview Window -->
+      <div class="hero-preview">
+        <div class="preview-window">
+          <div class="window-header">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+          </div>
+          <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_1_Dashboard_1920x1080.png" alt="Print Ofo Windows Server Dashboard" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM VS SOLUTION -->
+  <section style="background: var(--light-bg);">
+    <div class="container">
+      <div class="section-title">
+        <div class="subheading">Why Print Ofo?</div>
+        <h2>The Modern Way to Print from Your Phone</h2>
+        <p>No more emailing documents to yourself or waiting for WhatsApp Web to load.</p>
+      </div>
+
+      <div class="comparison-grid">
+        <div class="comparison-card card-problem">
+          <div class="card-title">
+            ❌ The Frustrating Old Way
+          </div>
+          <ul class="step-list">
+            <li><span>⚠️</span> Open WhatsApp or Email on your PC</li>
+            <li><span>⚠️</span> Download the PDF or Photo to your computer's Downloads folder</li>
+            <li><span>⚠️</span> Find the file, open it in a PDF reader or viewer</li>
+            <li><span>⚠️</span> Click Print, adjust settings, and wait</li>
+            <li><span>⚠️</span> Waste 3 to 5 minutes for a single page!</li>
+          </ul>
+        </div>
+
+        <div class="comparison-card card-solution">
+          <div class="card-title">
+            ✅ The Fast Print Ofo Way
+          </div>
+          <ul class="step-list">
+            <li><span>⚡</span> Open the photo or PDF on your Android phone</li>
+            <li><span>⚡</span> Tap <b>Share &gt; Print Ofo</b></li>
+            <li><span>⚡</span> Both devices auto-connect instantly over local Wi-Fi</li>
+            <li><span>⚡</span> Tap <b>Print Now</b></li>
+            <li><span>⚡</span> Printer starts printing in under 2 seconds!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="container">
+      <div class="section-title">
+        <div class="subheading">Features</div>
+        <h2>Built for Speed, Reliability &amp; Privacy</h2>
+        <p>Everything you need for seamless wireless printing with zero maintenance.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Zero-Config UDP Auto Pairing</h3>
+          <p>Automatic discovery over UDP port 8089. Even if your router assigns a new local IP to your PC, the mobile app automatically finds and reconnects without re-pairing.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🖨️</div>
+          <h3>Native Windows Spooler</h3>
+          <p>Taps directly into the Windows Native Spooler API (winspool.drv). If your computer can print to the printer, Print Ofo can print to it with full hardware acceleration.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>100% Offline &amp; Private</h3>
+          <p>Zero cloud servers, zero account sign-ups, and zero tracking. Your personal photos and private documents remain strictly inside your local Wi-Fi network.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h3>Windows Autostart &amp; Tray Mode</h3>
+          <p>Runs automatically in the background when your PC boots. Closing the window minimizes it to the Windows System Tray, keeping the server alive 24x7.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⚙️</div>
+          <h3>Full Print Controls</h3>
+          <p>Customize copies, color vs monochrome, paper size (A4, 4x6 Photo, Legal), orientation, duplex (double-sided), and fit-to-page scaling right from your phone.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📲</div>
+          <h3>Direct Android Share Target</h3>
+          <p>Integrates seamlessly into the Android system share sheet. Send photos directly from Google Photos, Gallery, WhatsApp, or File Manager in 1 tap.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS SHOWCASE -->
+  <section id="screenshots" style="background: var(--light-bg);">
+    <div class="container">
+      <div class="section-title">
+        <div class="subheading">Visual Interface</div>
+        <h2>Clean, Fast &amp; Intuitive Design</h2>
+        <p>Crafted with WPF on Windows and Material 3 on Android for maximum simplicity.</p>
+      </div>
+
+      <div class="showcase-tabs">
+        <button class="tab-btn active" onclick="switchTab('desktop')">💻 Windows Desktop Server</button>
+        <button class="tab-btn" onclick="switchTab('mobile')">📱 Android Mobile App</button>
+      </div>
+
+      <!-- Desktop Screenshots -->
+      <div id="desktop-gallery" class="gallery-grid">
+        <div class="gallery-item">
+          <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_1_Dashboard_1920x1080.png" alt="Server Dashboard" />
+          <div class="gallery-info">
+            <h4>1. Real-Time Server Dashboard</h4>
+            <p>Live server status, local IP, ports (HTTP 8080 / HTTPS 8443) and connected devices.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_2_Printers_1920x1080.png" alt="Printers Discovery" />
+          <div class="gallery-info">
+            <h4>2. Auto-Detected Spooler Printers</h4>
+            <p>Lists Canon, Epson, HP, and all active Windows spooler printers with status.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_3_Pairing_Security_1920x1080.png" alt="Pairing Security" />
+          <div class="gallery-info">
+            <h4>3. QR Code &amp; 6-Digit PIN Pairing</h4>
+            <p>Encrypted local pairing token saved permanently for zero-effort reconnects.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/store_assets/Screenshot_4_SpoolerQueue_1920x1080.png" alt="Spooler Queue" />
+          <div class="gallery-info">
+            <h4>4. Live Print Queue Monitor</h4>
+            <p>Monitors active print jobs, page counts, and transmission in real time.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Screenshots (Hidden by default) -->
+      <div id="mobile-gallery" class="gallery-grid" style="display: none;">
+        <div class="gallery-item">
+          <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_1_Home_1080x2400.png" alt="Mobile Home Screen" />
+          <div class="gallery-info">
+            <h4>Mobile Home Screen</h4>
+            <p>Clean Material 3 interface with 1-tap Photo &amp; PDF selection.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_2_Scanner_Connect_1080x2400.png" alt="Fast Connect Scanner" />
+          <div class="gallery-info">
+            <h4>Instant Wi-Fi Discovery</h4>
+            <p>Fast QR code scanner or PIN input with auto UDP fallback.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_3_Preview_Settings_1080x2400.png" alt="Preview &amp; Settings" />
+          <div class="gallery-info">
+            <h4>Print Settings &amp; Preview</h4>
+            <p>Select copies, color mode, paper size, and orientation.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <img src="https://raw.githubusercontent.com/kkrkishan/kkr-wireless-print/main/release/playstore_assets/Phone_Screenshot_4_Spooler_Tracking_1080x2400.png" alt="Spooler Tracking" />
+          <div class="gallery-info">
+            <h4>Real-Time Progress</h4>
+            <p>Live progress tracking while the document streams to the spooler.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="container">
+      <div class="section-title">
+        <div class="subheading">Simple Setup</div>
+        <h2>Get Started in Under 2 Minutes</h2>
+        <p>No complicated network setup or technical skills required.</p>
+      </div>
+
+      <div class="steps-container">
+        <div class="step-box">
+          <div class="step-number">1</div>
+          <h3>Install PC Server</h3>
+          <p>Download and run <b>Print_Ofo_Setup.exe</b> on your Windows 10/11 laptop or desktop connected to your USB printer. It starts instantly.</p>
+        </div>
+
+        <div class="step-box">
+          <div class="step-number">2</div>
+          <h3>Install Android App</h3>
+          <p>Download <b>Print Ofo Mobile</b> onto your phone. Connect phone and PC to the same Wi-Fi (or mobile hotspot), and scan the QR code once.</p>
+        </div>
+
+        <div class="step-box">
+          <div class="step-number">3</div>
+          <h3>Print Any Document</h3>
+          <p>Open any photo or PDF on your phone, tap <b>Share &gt; Print Ofo</b>, choose your printer settings, and hit <b>Print Now</b>!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORTED PRINTERS -->
+  <section id="printers" style="background: var(--light-bg);">
+    <div class="container">
+      <div class="section-title">
+        <div class="subheading">Hardware Compatibility</div>
+        <h2>Works with Any Windows-Compatible Printer</h2>
+        <p>Tested rigorously on industry-leading non-Wi-Fi and Wi-Fi printers.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>Canon</h3>
+          <p>imageCLASS MF4800 Series, MF3010, LBP2900B, Pixma G Series, TS Series</p>
+        </div>
+        <div class="feature-card">
+          <h3>Epson</h3>
+          <p>EcoTank L3210, L3150, L3110, L805, M200, WorkForce, PictureMate</p>
+        </div>
+        <div class="feature-card">
+          <h3>HP (Hewlett-Packard)</h3>
+          <p>LaserJet 1020, M1005 MFP, 1200w, DeskJet 2331, 2700, Ink Tank 415</p>
+        </div>
+        <div class="feature-card">
+          <h3>Brother</h3>
+          <p>DCP-L2520D, HL-L2321D, MFC-T920DW, HL-1210W</p>
+        </div>
+        <div class="feature-card">
+          <h3>Thermal &amp; POS</h3>
+          <p>TVS Electronics, Everycom, Rongta 58mm/80mm receipt printers</p>
+        </div>
+        <div class="feature-card">
+          <h3>Virtual Printers</h3>
+          <p>Microsoft Print to PDF, OneNote, XPS Document Writer</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOADS -->
+  <section id="downloads">
+    <div class="container">
+      <div class="section-title">
+        <div class="subheading">Official Releases</div>
+        <h2>Download Print Ofo (v1.1.0)</h2>
+        <p>Choose your platform package. Always free, open source, and virus-scanned.</p>
+      </div>
+
+      <div class="download-grid">
+        <!-- Windows Setup -->
+        <div class="download-card highlight">
+          <div class="download-badge">Recommended for PC</div>
+          <div class="download-icon">💻</div>
+          <h3>Windows Installer</h3>
+          <p class="file-meta">Print_Ofo_Setup.exe • 67.0 MB • Windows 10/11 x64</p>
+          <a href="https://github.com/kkrkishan/kkr-wireless-print/releases/download/v1.1.0/Print_Ofo_Setup.exe" class="btn btn-primary" style="width: 100%;">
+            Download Setup (.exe)
+          </a>
+        </div>
+
+        <!-- Android APK -->
+        <div class="download-card highlight">
+          <div class="download-badge">Recommended for Phone</div>
+          <div class="download-icon">📱</div>
+          <h3>Android APK</h3>
+          <p class="file-meta">Print_Ofo_Mobile_v1.1.0.apk • 76.1 MB • Android 8.0+</p>
+          <a href="https://github.com/kkrkishan/kkr-wireless-print/releases/download/v1.1.0/Print_Ofo_Mobile_v1.1.0.apk" class="btn btn-primary" style="width: 100%;">
+            Download APK
+          </a>
+        </div>
+
+        <!-- Microsoft Store MSIX -->
+        <div class="download-card">
+          <div class="download-icon">🏬</div>
+          <h3>Microsoft Store MSIX</h3>
+          <p class="file-meta">Print_Ofo.msix • 98.8 MB • Publisher: kkrkishan</p>
+          <a href="https://github.com/kkrkishan/kkr-wireless-print/releases/download/v1.1.0/Print_Ofo.msix" class="btn btn-secondary" style="width: 100%;">
+            Download MSIX
+          </a>
+        </div>
+
+        <!-- Portable ZIP -->
+        <div class="download-card">
+          <div class="download-icon">📦</div>
+          <h3>Windows Portable</h3>
+          <p class="file-meta">Print_Ofo_Portable_v1.1.0.zip • 97.0 MB • Standalone</p>
+          <a href="https://github.com/kkrkishan/kkr-wireless-print/releases/download/v1.1.0/Print_Ofo_Portable_v1.1.0.zip" class="btn btn-secondary" style="width: 100%;">
+            Download ZIP
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" style="background: var(--light-bg);">
+    <div class="container">
+      <div class="section-title">
+        <div class="subheading">Got Questions?</div>
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about setting up and using Print Ofo.</p>
+      </div>
+
+      <div class="faq-container">
+        <div class="faq-item">
+          <div class="faq-question">Q: Does Print Ofo need an active internet connection?</div>
+          <div class="faq-answer">No. Print Ofo operates 100% locally on your Wi-Fi router or laptop mobile hotspot. No internet bandwidth is consumed and your documents never leave your local network.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">Q: Do I need to pair my phone with a QR code every time?</div>
+          <div class="faq-answer">No. You only scan the QR code once during the initial pairing. After that, both your PC and Android phone remember each other and auto-reconnect dynamically whenever connected to the same Wi-Fi.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">Q: What happens when I close the Windows app window?</div>
+          <div class="faq-answer">Clicking the close button ('X') minimizes the application to the Windows System Tray (notification area near your taskbar clock). The print server continues running 24/7 so your mobile phone can print at any time.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">Q: Does the PC server start automatically when my computer boots?</div>
+          <div class="faq-answer">Yes! Version 1.1.0 includes automatic Windows startup registration. Whenever you turn on or restart your PC, the Print Ofo server starts silently in the background.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">Q: Is my print data stored or tracked anywhere?</div>
+          <div class="faq-answer">Never. Print Ofo has zero cloud analytics, zero user telemetry, and zero tracking servers. Documents stream directly into the local Windows Spooler and are cleared upon printing.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-wrapper">
+        <div class="footer-brand">
+          🖨️ Print Ofo
+        </div>
+        <ul class="footer-links">
+          <li><a href="https://github.com/kkrkishan/kkr-wireless-print" target="_blank">GitHub Repository</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="https://printofo.blogspot.com/" target="_blank">Official Blog</a></li>
+        </ul>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Print Ofo. Developed by <b>KKR Kishan</b>. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT FOR TABS -->
+  <script>
+    function switchTab(type) {
+      const desktopGallery = document.getElementById('desktop-gallery');
+      const mobileGallery = document.getElementById('mobile-gallery');
+      const tabs = document.querySelectorAll('.tab-btn');
+
+      if (type === 'desktop') {
+        desktopGallery.style.display = 'grid';
+        mobileGallery.style.display = 'none';
+        tabs[0].classList.add('active');
+        tabs[1].classList.remove('active');
+      } else {
+        desktopGallery.style.display = 'none';
+        mobileGallery.style.display = 'grid';
+        tabs[0].classList.remove('active');
+        tabs[1].classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>

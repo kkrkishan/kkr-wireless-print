@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Print Ofo</title>
+  <link rel="icon" type="image/png" href="store_assets/Square44x44Logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #334155;
+      background: #f8fafc;
+      line-height: 1.7;
+      padding: 40px 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 48px;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+    h1 {
+      color: #0f172a;
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    .date {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: #1e293b;
+      font-size: 20px;
+      margin-top: 28px;
+      margin-bottom: 12px;
+    }
+    p, li {
+      font-size: 15px;
+      color: #475569;
+    }
+    ul {
+      padding-left: 20px;
+      margin-bottom: 16px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 24px;
+      color: #0284c7;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .back-btn:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-btn">← Back to Print Ofo Home</a>
+    <h1>Privacy Policy</h1>
+    <div class="date">Last updated: November 2026</div>
+
+    <p>
+      At <b>Print Ofo</b>, user privacy is our foundational principle. This Privacy Policy outlines how your information is handled when using the Print Ofo Windows Server and the Print Ofo Android Application.
+    </p>
+
+    <h2>1. 100% Local Network Operation (Zero Cloud Servers)</h2>
+    <p>
+      Print Ofo is engineered to work exclusively within your local Wi-Fi or LAN network. We do not operate external cloud servers, document relays, or telemetry databases.
+    </p>
+    <ul>
+      <li><b>No File Uploads to the Internet:</b> Photos, documents, and print data sent from your phone stream directly to your Windows PC over local network sockets (HTTP/HTTPS/UDP).</li>
+      <li><b>No Accounts or Sign-ups:</b> You are never required to provide your name, email, phone number, or credentials to use Print Ofo.</li>
+    </ul>
+
+    <h2>2. Data Collected & Stored Locally</h2>
+    <p>
+      The only data stored is strictly local to your devices:
+    </p>
+    <ul>
+      <li><b>Pairing Token:</b> A cryptographically generated token stored locally on your PC and Android device to authorize print requests.</li>
+      <li><b>Last Known IP Address:</b> Saved in your phone's local storage (`SharedPreferences`) to allow dynamic auto-reconnecting on your Wi-Fi network.</li>
+      <li><b>Spooler Temporary Buffer:</b> When a document is received by your PC, it is written to a temporary local spool file and passed to the native Windows Print Spooler. Once the job completes, temporary buffers are removed.</li>
+    </ul>
+
+    <h2>3. Permissions Used by Android Application</h2>
+    <ul>
+      <li><b>Wi-Fi / Network State:</b> Needed to detect if the phone is connected to the same local Wi-Fi as your PC.</li>
+      <li><b>Camera Permission (Optional):</b> Only used to scan the pairing QR code displayed on your PC screen. No photos or video frames are saved or transmitted.</li>
+      <li><b>Storage / Media Access:</b> Needed when you choose to select a photo or PDF file from your phone storage to print.</li>
+    </ul>
+
+    <h2>4. Third-Party Services & Tracking</h2>
+    <p>
+      Print Ofo contains <b>no third-party analytics SDKs, no advertisement trackers, and no telemetry services</b>. Your usage data is never sold or shared with any third party.
+    </p>
+
+    <h2>5. Contact Information</h2>
+    <p>
+      If you have questions about this Privacy Policy, please open an issue on our official GitHub repository:
+      <br />
+      <a href="https://github.com/kkrkishan/kkr-wireless-print" target="_blank" style="color: #0284c7;">https://github.com/kkrkishan/kkr-wireless-print</a>
+    </p>
+  </div>
+</body>
+</html>
